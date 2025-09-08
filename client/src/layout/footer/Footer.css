@@ -1,0 +1,14 @@
+
+
+.page-footer {
+    color: white;
+
+    width: fit-content;
+    margin-top: auto;
+    margin-inline: auto;
+}
+
+.page-footer a {
+    text-decoration: inherit;
+    color: inherit;
+}

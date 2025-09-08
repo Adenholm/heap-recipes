@@ -1,0 +1,35 @@
+
+.recipe-container {
+    background-color: aliceblue;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+
+    position: relative;
+
+    width: fit-content;
+    margin-inline: auto;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+.recipe-page .recipe-image {
+    width: 15rem;
+    border-radius: .5rem;
+}
+
+.recipe-page .back-arrow {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+
+    color: #000;
+    height: fit-content;
+}
+
+.recipe-page .recipe-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+}

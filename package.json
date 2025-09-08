@@ -1,0 +1,15 @@
+{
+  "name": "heap-recipes",
+  "version": "1.0.0",
+  "description": "A simple recipe website",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd client && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "recipes"
+  ],
+  "author": "Erik Persson & Hanna Adenholm",
+  "license": "ISC"
+}

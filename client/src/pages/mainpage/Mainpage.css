@@ -1,0 +1,10 @@
+
+
+.recipe-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 2rem;
+    margin: 2rem;
+}

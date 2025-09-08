@@ -1,0 +1,218 @@
+[
+    {
+        "id": 1,
+        "title": "Spaghetti Bolognese",
+        "ingredients": [
+            "200g spaghetti",
+            "100g minced beef",
+            "1 onion",
+            "2 cloves garlic",
+            "400g canned tomatoes",
+            "2 tbsp olive oil",
+            "Salt and pepper to taste"
+        ],
+        "instructions": [
+            "Cook spaghetti according to package instructions.",
+            "Heat olive oil in a pan, add chopped onions and garlic, and sauté until translucent.",
+            "Add minced beef and cook until browned.",
+            "Pour in canned tomatoes, season with salt and pepper, and simmer for 20 minutes.",
+            "Serve sauce over cooked spaghetti."
+        ],
+        "prepTime": 15,
+        "servings": 2,
+        "category": "Middag",
+        "imageUrl": "https://cdn1.mutti-parma.com/spai/q_glossy+ret_img+to_webp/mutti-parma.com/app/uploads/sites/14/2020/06/j3t2bzga.jpeg-free-to-use.jpg"
+    },
+    {
+        "id": 2,
+        "title": "Poke Bowl",
+        "ingredients": [
+            "200g sushi rice",
+            "150g fresh tuna, diced",
+            "1 avocado, sliced",
+            "1 cucumber, sliced",
+            "2 tbsp soy sauce",
+            "1 tbsp sesame oil",
+            "1 tsp rice vinegar",
+            "Sesame seeds for garnish"
+        ],
+        "instructions": [
+            "Cook sushi rice according to package instructions and let it cool.",
+            "In a bowl, mix soy sauce, sesame oil, and rice vinegar to make the dressing.",
+            "In serving bowls, layer the rice, diced tuna, avocado slices, and cucumber slices.",
+            "Drizzle with the dressing and garnish with sesame seeds."
+        ],
+        "prepTime": 20,
+        "servings": 2,
+        "category": "Lunch",
+        "imageUrl": "https://salmatest.objects.frb.io/assets/images/recipe-images/Swedish-recipes/_recipeFull/Pokebowl-oppskirft_web_stor.jpg"
+    },
+    {
+        "id": 3,
+        "title": "Hummusblandning med ostsås",
+        "ingredients": [
+            "200g spaghetti",
+            "100g minced beef",
+            "1 onion",
+            "2 cloves garlic",
+            "400g canned tomatoes",
+            "2 tbsp olive oil",
+            "Salt and pepper to taste"
+        ],
+        "instructions": [
+            "Cook spaghetti according to package instructions.",
+            "Heat olive oil in a pan, add chopped onions and garlic, and sauté until translucent.",
+            "Add minced beef and cook until browned.",
+            "Pour in canned tomatoes, season with salt and pepper, and simmer for 20 minutes.",
+            "Serve sauce over cooked spaghetti."
+        ],
+        "prepTime": 15,
+        "servings": 2,
+        "category": "Middag",
+        "imageUrl": "https://cdn1.mutti-parma.com/spai/q_glossy+ret_img+to_webp/mutti-parma.com/app/uploads/sites/14/2020/06/j3t2bzga.jpeg-free-to-use.jpg"
+    },
+    {
+        "id": 4,
+        "title": "Sötpotatis med kikärtor",
+        "ingredients": [
+            "200g sushi rice",
+            "150g fresh tuna, diced",
+            "1 avocado, sliced",
+            "1 cucumber, sliced",
+            "2 tbsp soy sauce",
+            "1 tbsp sesame oil",
+            "1 tsp rice vinegar",
+            "Sesame seeds for garnish"
+        ],
+        "instructions": [
+            "Cook sushi rice according to package instructions and let it cool.",
+            "In a bowl, mix soy sauce, sesame oil, and rice vinegar to make the dressing.",
+            "In serving bowls, layer the rice, diced tuna, avocado slices, and cucumber slices.",
+            "Drizzle with the dressing and garnish with sesame seeds."
+        ],
+        "prepTime": 20,
+        "servings": 2,
+        "category": "Lunch",
+        "imageUrl": "https://salmatest.objects.frb.io/assets/images/recipe-images/Swedish-recipes/_recipeFull/Pokebowl-oppskirft_web_stor.jpg"
+    },
+    {
+        "id": 5,
+        "title": "Spaghetti Bolognese",
+        "ingredients": [
+            "200g spaghetti",
+            "100g minced beef",
+            "1 onion",
+            "2 cloves garlic",
+            "400g canned tomatoes",
+            "2 tbsp olive oil",
+            "Salt and pepper to taste"
+        ],
+        "instructions": [
+            "Cook spaghetti according to package instructions.",
+            "Heat olive oil in a pan, add chopped onions and garlic, and sauté until translucent.",
+            "Add minced beef and cook until browned.",
+            "Pour in canned tomatoes, season with salt and pepper, and simmer for 20 minutes.",
+            "Serve sauce over cooked spaghetti."
+        ],
+        "prepTime": 15,
+        "servings": 2,
+        "category": "Middag",
+        "imageUrl": "https://cdn1.mutti-parma.com/spai/q_glossy+ret_img+to_webp/mutti-parma.com/app/uploads/sites/14/2020/06/j3t2bzga.jpeg-free-to-use.jpg"
+    },
+    {
+        "id": 6,
+        "title": "Poke Bowl",
+        "ingredients": [
+            "200g sushi rice",
+            "150g fresh tuna, diced",
+            "1 avocado, sliced",
+            "1 cucumber, sliced",
+            "2 tbsp soy sauce",
+            "1 tbsp sesame oil",
+            "1 tsp rice vinegar",
+            "Sesame seeds for garnish"
+        ],
+        "instructions": [
+            "Cook sushi rice according to package instructions and let it cool.",
+            "In a bowl, mix soy sauce, sesame oil, and rice vinegar to make the dressing.",
+            "In serving bowls, layer the rice, diced tuna, avocado slices, and cucumber slices.",
+            "Drizzle with the dressing and garnish with sesame seeds."
+        ],
+        "prepTime": 20,
+        "servings": 2,
+        "category": "Lunch",
+        "imageUrl": "https://salmatest.objects.frb.io/assets/images/recipe-images/Swedish-recipes/_recipeFull/Pokebowl-oppskirft_web_stor.jpg"
+    },
+    {
+        "id": 7,
+        "title": "Spaghetti Bolognese",
+        "ingredients": [
+            "200g spaghetti",
+            "100g minced beef",
+            "1 onion",
+            "2 cloves garlic",
+            "400g canned tomatoes",
+            "2 tbsp olive oil",
+            "Salt and pepper to taste"
+        ],
+        "instructions": [
+            "Cook spaghetti according to package instructions.",
+            "Heat olive oil in a pan, add chopped onions and garlic, and sauté until translucent.",
+            "Add minced beef and cook until browned.",
+            "Pour in canned tomatoes, season with salt and pepper, and simmer for 20 minutes.",
+            "Serve sauce over cooked spaghetti."
+        ],
+        "prepTime": 15,
+        "servings": 2,
+        "category": "Middag",
+        "imageUrl": "https://cdn1.mutti-parma.com/spai/q_glossy+ret_img+to_webp/mutti-parma.com/app/uploads/sites/14/2020/06/j3t2bzga.jpeg-free-to-use.jpg"
+    },
+    {
+        "id": 8,
+        "title": "Poke Bowl",
+        "ingredients": [
+            "200g sushi rice",
+            "150g fresh tuna, diced",
+            "1 avocado, sliced",
+            "1 cucumber, sliced",
+            "2 tbsp soy sauce",
+            "1 tbsp sesame oil",
+            "1 tsp rice vinegar",
+            "Sesame seeds for garnish"
+        ],
+        "instructions": [
+            "Cook sushi rice according to package instructions and let it cool.",
+            "In a bowl, mix soy sauce, sesame oil, and rice vinegar to make the dressing.",
+            "In serving bowls, layer the rice, diced tuna, avocado slices, and cucumber slices.",
+            "Drizzle with the dressing and garnish with sesame seeds."
+        ],
+        "prepTime": 20,
+        "servings": 2,
+        "category": "Lunch",
+        "imageUrl": "https://salmatest.objects.frb.io/assets/images/recipe-images/Swedish-recipes/_recipeFull/Pokebowl-oppskirft_web_stor.jpg"
+    },
+    {
+        "id": 9,
+        "title": "Spaghetti Bolognese",
+        "ingredients": [
+            "200g spaghetti",
+            "100g minced beef",
+            "1 onion",
+            "2 cloves garlic",
+            "400g canned tomatoes",
+            "2 tbsp olive oil",
+            "Salt and pepper to taste"
+        ],
+        "instructions": [
+            "Cook spaghetti according to package instructions.",
+            "Heat olive oil in a pan, add chopped onions and garlic, and sauté until translucent.",
+            "Add minced beef and cook until browned.",
+            "Pour in canned tomatoes, season with salt and pepper, and simmer for 20 minutes.",
+            "Serve sauce over cooked spaghetti."
+        ],
+        "prepTime": 15,
+        "servings": 2,
+        "category": "Middag",
+        "imageUrl": "https://cdn1.mutti-parma.com/spai/q_glossy+ret_img+to_webp/mutti-parma.com/app/uploads/sites/14/2020/06/j3t2bzga.jpeg-free-to-use.jpg"
+    }
+]
