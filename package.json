@@ -11,5 +11,8 @@
     "recipes"
   ],
   "author": "Erik Persson & Hanna Adenholm",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "gh-pages": "^6.3.0"
+  }
 }

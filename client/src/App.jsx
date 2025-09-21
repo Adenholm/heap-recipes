@@ -10,7 +10,7 @@ import Footer from './layout/footer/Footer'
 function App() {
 
     return (
-        <BrowserRouter>
+        <BrowserRouter basename='/heap-recipes/'>
             <Header />
             <Routes>
                 <Route path='/recipe/:id' element={<Recipepage />} />

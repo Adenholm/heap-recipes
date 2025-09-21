@@ -1,13 +1,17 @@
 {
   "name": "heap-recipes",
   "private": true,
+  "homepage": "https://erikpersson0884.github.io/heap-recipes",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "build-and-deploy": "npm run build && npm run deploy"
   },
   "dependencies": {
     "react": "^19.1.1",
