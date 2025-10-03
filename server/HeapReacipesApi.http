@@ -1,0 +1,6 @@
+@HeapReacipesApi_HostAddress = http://localhost:5036
+
+GET {{HeapReacipesApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
