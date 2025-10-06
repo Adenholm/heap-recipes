@@ -15,18 +15,10 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Many-to-many Recipe <-> Ingredient
-        modelBuilder.Entity<RecipeIngredient>()
-            .HasKey(ri => new { ri.RecipeId, ri.IngredientId });
-
-        modelBuilder.Entity<RecipeIngredient>()
-            .HasOne(ri => ri.Recipe)
-            .WithMany(r => r.RecipeIngredients)
-            .HasForeignKey(ri => ri.RecipeId);
-
-        modelBuilder.Entity<RecipeIngredient>()
-            .HasOne(ri => ri.Ingredient)
-            .WithMany(i => i.RecipeIngredients)
-            .HasForeignKey(ri => ri.IngredientId);
+        modelBuilder.Entity<Recipe>()
+        .HasMany(r => r.Ingredients)
+        .WithOne(i => i.Recipe)
+        .HasForeignKey(i => i.RecipeId)
+        .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -23,17 +23,17 @@ public class Recipe
 
     public string? ImageUrl { get; set; }
     
-    public int PrepTime { get; set; } // in minutes
+    public int? PrepTime { get; set; } // in minutes
 
-    public int Servings { get; set; }
+    public int? Servings { get; set; }
 
     public string Instructions { get; set; } = default!;
 
     // foreign key
-    public int CategoryId { get; set; }
+    public int? CategoryId { get; set; }
     public Category? Category { get; set; }
 
-    public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
+    public ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 }
 
 public class Ingredient
@@ -41,17 +41,8 @@ public class Ingredient
     public int Id { get; set; }
     public string Name { get; set; } = default!;
 
-    public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
-}
+    public string? Quantity { get; set; }
 
-// join table
-public class RecipeIngredient
-{
     public int RecipeId { get; set; }
-    public Recipe Recipe { get; set; } = default!;
-
-    public int IngredientId { get; set; }
-    public Ingredient Ingredient { get; set; } = default!;
-
-    public string? Quantity { get; set; }  // e.g. "2 cups"
+    public Recipe? Recipe { get; set; }
 }
