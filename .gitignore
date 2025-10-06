@@ -88,3 +88,6 @@ Thumbs.db
 
 server/appsettings.json
 server/appsettings.Development.json
+
+server/obj/*
+server/bin/*
