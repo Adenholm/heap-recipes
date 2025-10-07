@@ -9,8 +9,8 @@ public class CreateRecipeDto
     public int? PrepTime { get; set; } // in minutes
     public int? Servings { get; set; }
     public string Instructions { get; set; } = default!;
-    public int? CategoryId { get; set; }
     public List<CreateIngredientDto> Ingredients { get; set; } = new();
+    public List<CreateTagDto> Tags { get; set; } = new();
 }
 
 public class CreateIngredientDto
@@ -20,9 +20,8 @@ public class CreateIngredientDto
     public string? Quantity { get; set; }
 }
 
-public class IngredientDto
+public class CreateTagDto
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public string? Quantity { get; set; }
+    public int? Id { get; set; }
+    public string Name { get; set; } = "";
 }

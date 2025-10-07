@@ -91,3 +91,4 @@ server/appsettings.Development.json
 
 server/obj/*
 server/bin/*
+.fake

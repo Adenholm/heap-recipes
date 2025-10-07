@@ -8,13 +8,6 @@ public class User
     public string? Role { get; set; }
 }
 
-public class Category
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = default!;
-    public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
-}
-
 public class Recipe
 {
     public int Id { get; set; }
@@ -22,18 +15,16 @@ public class Recipe
     public string? Description { get; set; }
 
     public string? ImageUrl { get; set; }
-    
+
     public int? PrepTime { get; set; } // in minutes
 
     public int? Servings { get; set; }
 
     public string Instructions { get; set; } = default!;
 
-    // foreign key
-    public int? CategoryId { get; set; }
-    public Category? Category { get; set; }
-
     public ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
+    
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }
 
 public class Ingredient
@@ -45,4 +36,12 @@ public class Ingredient
 
     public int RecipeId { get; set; }
     public Recipe? Recipe { get; set; }
+}
+
+public class Tag
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+
+    public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
 }

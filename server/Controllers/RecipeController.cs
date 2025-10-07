@@ -17,7 +17,7 @@ public class RecipesController : ControllerBase
     public async Task<ActionResult<IEnumerable<Recipe>>> GetAll()
     {
         return await _db.Recipes
-            .Include(r => r.Category)
+            .Include(r => r.Tags)
             .Include(r => r.Ingredients)
             .ToListAsync();
     }
@@ -26,24 +26,17 @@ public class RecipesController : ControllerBase
     public async Task<ActionResult<Recipe>> GetById(int id)
     {
         var recipe = await _db.Recipes
-            .Include(r => r.Category)
+            .Include(r => r.Tags)
             .Include(r => r.Ingredients)
             .FirstOrDefaultAsync(r => r.Id == id);
 
         return recipe is null ? NotFound() : recipe;
     }
 
-    [Authorize] // only logged-in users can create
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<Recipe>> CreateRecipe([FromBody] CreateRecipeDto dto)
     {
-        if (dto.CategoryId is not null)
-        {
-            var category = await _db.Categories.FindAsync(dto.CategoryId);
-            if (category is null)
-                return BadRequest($"Category with ID {dto.CategoryId} does not exist.");
-        }
-
         var recipe = new Recipe
         {
             Title = dto.Title,
@@ -51,23 +44,35 @@ public class RecipesController : ControllerBase
             ImageUrl = dto.ImageUrl,
             PrepTime = dto.PrepTime,
             Servings = dto.Servings,
-            Instructions = dto.Instructions,
-            CategoryId = dto.CategoryId
+            Instructions = dto.Instructions
         };
 
         // Handle ingredients
-        recipe.Ingredients = new List<Ingredient>();
-        foreach (var ingDto in dto.Ingredients)
-        {
-            if (!string.IsNullOrWhiteSpace(ingDto.Name))
+        recipe.Ingredients = dto.Ingredients
+            .Where(ing => !string.IsNullOrWhiteSpace(ing.Name))
+            .Select(ingDto => new Ingredient
             {
-                var ingredient = new Ingredient
-                {
-                    Name = ingDto.Name,
-                    Quantity = ingDto.Quantity
-                    // RecipeId will be set by EF Core when saving
-                };
-                recipe.Ingredients.Add(ingredient);
+                Name = ingDto.Name,
+                Quantity = ingDto.Quantity
+            }).ToList();
+
+        // Handle tags
+        foreach (var tagDto in dto.Tags)
+        {
+            if (string.IsNullOrWhiteSpace(tagDto.Name))
+                continue;
+
+            var existingTag = await _db.Tags
+                .FirstOrDefaultAsync(t => t.Name.ToLower() == tagDto.Name.ToLower());
+
+            if (existingTag != null)
+            {
+                recipe.Tags.Add(existingTag);
+            }
+            else
+            {
+                var newTag = new Tag { Name = tagDto.Name };
+                recipe.Tags.Add(newTag);
             }
         }
 
@@ -89,7 +94,6 @@ public class RecipesController : ControllerBase
 
         recipe.Title = dto.Title;
         recipe.Description = dto.Description;
-        recipe.CategoryId = dto.CategoryId;
         recipe.ImageUrl = dto.ImageUrl;
         recipe.PrepTime = dto.PrepTime;
         recipe.Servings = dto.Servings;
@@ -129,6 +133,29 @@ public class RecipesController : ControllerBase
         // Clear old ingredients and add updated ones
         _db.Ingredients.RemoveRange(recipe.Ingredients);
         recipe.Ingredients = updatedIngredients;
+
+        var updatedTags = new List<Tag>();
+        foreach (var tagDto in dto.Tags)
+        {
+            if (string.IsNullOrWhiteSpace(tagDto.Name))
+                continue;
+
+            var existingTag = await _db.Tags
+                .FirstOrDefaultAsync(t => t.Name.ToLower() == tagDto.Name.ToLower());
+
+            if (existingTag != null)
+            {
+                if (!recipe.Tags.Any(t => t.Id == existingTag.Id))
+                    updatedTags.Add(existingTag);
+            }
+            else
+            {
+                var newTag = new Tag { Name = tagDto.Name };
+                updatedTags.Add(newTag);
+            }
+        }
+
+        recipe.Tags = updatedTags;
 
         await _db.SaveChangesAsync();
         return NoContent();
