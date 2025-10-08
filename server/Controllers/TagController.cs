@@ -1,6 +1,7 @@
 
 using HeapRecipeApi.Data;
 using HeapRecipeApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,7 @@ public class TagsController : ControllerBase
         return tag is null ? NotFound() : tag;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<Tag>> CreateTag([FromBody] CreateTagDto dto)
     {
@@ -44,6 +46,7 @@ public class TagsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = tag.Id }, tag);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateTag(int id, [FromBody] CreateTagDto dto)
     {
@@ -55,7 +58,8 @@ public class TagsController : ControllerBase
 
         return NoContent();
     }
-    
+
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTag(int id)
     {

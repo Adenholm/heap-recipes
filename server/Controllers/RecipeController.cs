@@ -87,11 +87,13 @@ public class RecipesController : ControllerBase
     {
         var recipe = await _db.Recipes
             .Include(r => r.Ingredients)
+            .Include(r => r.Tags)
             .FirstOrDefaultAsync(r => r.Id == id);
 
-        if (recipe is null)
+        if (recipe == null)
             return NotFound($"Recipe with ID {id} not found.");
 
+        // Update recipe fields
         recipe.Title = dto.Title;
         recipe.Description = dto.Description;
         recipe.ImageUrl = dto.ImageUrl;
@@ -99,67 +101,63 @@ public class RecipesController : ControllerBase
         recipe.Servings = dto.Servings;
         recipe.Instructions = dto.Instructions;
 
-        var updatedIngredients = new List<Ingredient>();
-        foreach (var ingDto in dto.Ingredients)
-        {
-            Ingredient? ingredient = null;
+        // --- INGREDIENTS ---
+        var dtoIngredientIds = dto.Ingredients
+            .Where(i => i.Id.HasValue)
+            .Select(i => i.Id.Value)
+            .ToHashSet();
 
-        if (ingDto.Id is not null)
+        // Remove deleted ingredients (let EF mark them for deletion)
+        var ingredientsToRemove = recipe.Ingredients
+            .Where(i => !dtoIngredientIds.Contains(i.Id))
+            .ToList();
+        foreach (var ing in ingredientsToRemove)
         {
-            ingredient = await _db.Ingredients.FindAsync(ingDto.Id);
-            if (ingredient != null)
-            {
-                // Update existing ingredient
-                ingredient.Name = ingDto.Name;
-                ingredient.Quantity = ingDto.Quantity;
-                updatedIngredients.Add(ingredient);
-                continue;
-            }
+            recipe.Ingredients.Remove(ing);
         }
 
-        if (ingredient is null && !string.IsNullOrWhiteSpace(ingDto.Name))
+        foreach (var ingDto in dto.Ingredients)
         {
-                ingredient = new Ingredient
+            var existingIng = recipe.Ingredients.FirstOrDefault(i => i.Id == ingDto.Id);
+
+            if (existingIng != null)
+            {
+                // EF is already tracking this, just update properties
+                existingIng.Name = ingDto.Name;
+                existingIng.Quantity = ingDto.Quantity;
+            }
+            else
+            {
+                // New ingredient — EF will insert this
+                recipe.Ingredients.Add(new Ingredient
                 {
                     Name = ingDto.Name,
                     Quantity = ingDto.Quantity,
                     RecipeId = recipe.Id
-                };
-                _db.Ingredients.Add(ingredient);
-                updatedIngredients.Add(ingredient);
+                });
             }
         }
 
-        // Clear old ingredients and add updated ones
-        _db.Ingredients.RemoveRange(recipe.Ingredients);
-        recipe.Ingredients = updatedIngredients;
+    // --- TAGS ---
+    recipe.Tags.Clear();
+    foreach (var tagDto in dto.Tags)
+    {
+        if (string.IsNullOrWhiteSpace(tagDto.Name))
+            continue;
 
-        var updatedTags = new List<Tag>();
-        foreach (var tagDto in dto.Tags)
-        {
-            if (string.IsNullOrWhiteSpace(tagDto.Name))
-                continue;
+        var tag = await _db.Tags.FirstOrDefaultAsync(t =>
+            t.Name.ToLower() == tagDto.Name.ToLower());
 
-            var existingTag = await _db.Tags
-                .FirstOrDefaultAsync(t => t.Name.ToLower() == tagDto.Name.ToLower());
+        if (tag == null)
+            tag = new Tag { Name = tagDto.Name };
 
-            if (existingTag != null)
-            {
-                if (!recipe.Tags.Any(t => t.Id == existingTag.Id))
-                    updatedTags.Add(existingTag);
-            }
-            else
-            {
-                var newTag = new Tag { Name = tagDto.Name };
-                updatedTags.Add(newTag);
-            }
-        }
-
-        recipe.Tags = updatedTags;
-
-        await _db.SaveChangesAsync();
-        return NoContent();
+        recipe.Tags.Add(tag);
     }
+
+    await _db.SaveChangesAsync();
+    return NoContent();
+}
+
 
     [Authorize]
     [HttpDelete("{id}")]
