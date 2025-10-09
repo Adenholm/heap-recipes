@@ -3,17 +3,18 @@ import "./RecipePage.css";
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import recipesRaw from "../../data/recipes.json";
+import api from "../../service/apiClient";
 
 const RecipePage = () => {
     const { id } = useParams<{ id: string }>();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
-    const recipes: Recipe[] = recipesRaw as Recipe[];
 
     useEffect(() => {
-        const foundRecipe = recipes.find((r) => r.id === Number(id));
-        if (foundRecipe) {
-            setRecipe(foundRecipe);
-        }
+        api.get(`/recipes/${id}`).then(response => {
+            setRecipe(response.data);
+        }).catch(error => {
+            console.error('Error fetching recipe:', error);
+        });
     }, [id]);
 
     if (!recipe) {
@@ -37,7 +38,7 @@ const RecipePage = () => {
                     <h3>Ingredienser</h3>
                     <ul>
                         {recipe.ingredients.map((ingredient, index) => (
-                            <li key={index}>{ingredient}</li>
+                            <li key={index}>{ingredient.quantity + " " + ingredient.name}</li>
                         ))}
                     </ul>
                 </aside>
@@ -50,14 +51,10 @@ const RecipePage = () => {
                         <p>|</p>
                         <p>{recipe.servings} portioner</p>
                         <p>|</p>
-                        <p>{recipe.category}</p>
+                        <p>{recipe.tags.map(tag => tag.name).join(", ")}</p>
                     </div>
 
-                    <ol className="recipe-instructions">
-                        {recipe.instructions.map((step, index) => (
-                            <li key={index}>{step}</li>
-                        ))}
-                    </ol>
+                    <p>{recipe.instructions}</p>
                 </div>
             </div>
         </div>

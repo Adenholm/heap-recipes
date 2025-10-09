@@ -93,7 +93,6 @@ public class RecipesController : ControllerBase
         if (recipe == null)
             return NotFound($"Recipe with ID {id} not found.");
 
-        // Update recipe fields
         recipe.Title = dto.Title;
         recipe.Description = dto.Description;
         recipe.ImageUrl = dto.ImageUrl;
@@ -107,7 +106,6 @@ public class RecipesController : ControllerBase
             .Select(i => i.Id.Value)
             .ToHashSet();
 
-        // Remove deleted ingredients (let EF mark them for deletion)
         var ingredientsToRemove = recipe.Ingredients
             .Where(i => !dtoIngredientIds.Contains(i.Id))
             .ToList();
@@ -122,13 +120,11 @@ public class RecipesController : ControllerBase
 
             if (existingIng != null)
             {
-                // EF is already tracking this, just update properties
                 existingIng.Name = ingDto.Name;
                 existingIng.Quantity = ingDto.Quantity;
             }
             else
             {
-                // New ingredient — EF will insert this
                 recipe.Ingredients.Add(new Ingredient
                 {
                     Name = ingDto.Name,
@@ -138,25 +134,25 @@ public class RecipesController : ControllerBase
             }
         }
 
-    // --- TAGS ---
-    recipe.Tags.Clear();
-    foreach (var tagDto in dto.Tags)
-    {
-        if (string.IsNullOrWhiteSpace(tagDto.Name))
-            continue;
+        // --- TAGS ---
+        recipe.Tags.Clear();
+        foreach (var tagDto in dto.Tags)
+        {
+            if (string.IsNullOrWhiteSpace(tagDto.Name))
+                continue;
 
-        var tag = await _db.Tags.FirstOrDefaultAsync(t =>
-            t.Name.ToLower() == tagDto.Name.ToLower());
+            var tag = await _db.Tags.FirstOrDefaultAsync(t =>
+                t.Name.ToLower() == tagDto.Name.ToLower());
 
-        if (tag == null)
-            tag = new Tag { Name = tagDto.Name };
+            if (tag == null)
+                tag = new Tag { Name = tagDto.Name };
 
-        recipe.Tags.Add(tag);
+            recipe.Tags.Add(tag);
+        }
+
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
-
-    await _db.SaveChangesAsync();
-    return NoContent();
-}
 
 
     [Authorize]
