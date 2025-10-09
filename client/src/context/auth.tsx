@@ -4,12 +4,13 @@ import { ReactNode } from "react";
 
 interface AuthContextType {
   token: string | null;
+  isAuthenticated: boolean;
   onLogin: (email: string, password: string) => Promise<void>;
   onLogout: () => void;
   onRegister: (email: string, password: string) => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType>(null!);
 
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -31,9 +32,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [token]);
 
-  const handleLogin = async (email: string, password: string) => {
-    const { data } = await api.post('/auth/login', { email, password });
+  const handleLogin = async (username: string, password: string) => {
+    const { data } = await api.post('/auth/login', { username, password });
     localStorage.setItem('token', data.token);
+    setToken(data.token);
   };
 
   const handleLogout = () => {

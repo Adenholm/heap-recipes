@@ -3,12 +3,19 @@
 .page-header {
     color: white;
     display: flex;
-    justify-content: left;
+    justify-content: space-between;
     flex-direction: row;
     align-items: center;
     gap: 1rem;
 
     padding: 1rem 2.5rem;
+}
+
+.section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
 }
 
 .page-header img {
@@ -24,3 +31,8 @@
     text-decoration: none;
 }
 
+.icon {
+    height: 2.5rem;
+    width: 2.5rem;
+    cursor: pointer;
+}

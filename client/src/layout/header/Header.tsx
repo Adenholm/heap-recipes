@@ -1,21 +1,45 @@
-import React from 'react';
+import { useContext } from 'react';
 import './Header.css';
 
-import serving from '../../assets/images/serving.svg';
+import ramen from '../../assets/images/ramen.svg';
+import login from '../../assets/images/login.svg';
+import account from '../../assets/images/account.svg';
+import addRecipe from '../../assets/images/add-recipe.svg';
 import { Link } from 'react-router-dom';
+import { ModalContext } from '../../context/modal';
+import LoginModal from '../../components/loginModal/Login';
+import { AuthContext } from '../../context/auth';
 
 const Header = () => {
-    return (
-    <header className='page-header'>
-        <Link to="/" className="home-link">
-            <img src={serving} alt="Logo" />
-        </Link>
+    const { openModal, setModal } = useContext(ModalContext);
+    const { isAuthenticated, onLogout } = useContext(AuthContext);
 
-        <Link to="/" className="home-link">
-            <h1>Hannas & Erik's Recipes</h1>
-        </Link>
-    </header>
-    )
+    const showLoginModal = () => {
+        setModal('Login', <LoginModal/>);
+        openModal();
+    };
+
+        return (
+        <header className='page-header'>
+            <div className="section">
+                <Link to="/" className="home-link">
+                    <img src={ramen} alt="Logo" />
+                </Link>
+
+                <Link to="/" className="home-link">
+                    <h1>Hannas & Erik's Recipes</h1>
+                </Link>
+            </div>
+            {!isAuthenticated && <img src={login} alt="" aria-hidden="true" onClick={showLoginModal} className='icon'/>}
+            {isAuthenticated && 
+                <div className='section'>
+                    <Link to="/add-recipe">
+                        <img src={addRecipe} alt="Add Recipe" className='icon'/>
+                    </Link>
+                    <img src={account} alt="" aria-hidden="true" className='icon' onClick={onLogout}/>
+                </div>}
+        </header>
+        )
 };
 
 export default Header;
