@@ -8,6 +8,7 @@
     position: relative;
 
     width: fit-content;
+    max-width: 80%;
     margin-inline: auto;
     padding: 2rem;
     border-radius: 1rem;
