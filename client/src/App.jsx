@@ -8,6 +8,7 @@ import Header from './layout/header/Header'
 import Footer from './layout/footer/Footer'
 import Modal from './components/modal/modal'
 import AddRecipePage from './pages/addRecipepage/AddRecipepage'
+import EditRecipePage from './pages/editRecipepage/EditRecipePage'
 import { ProtectedRoute } from './context/auth'
 
 function App() {
@@ -24,6 +25,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <AddRecipePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path='/edit-recipe/:id'
+                    element={
+                        <ProtectedRoute>
+                            <EditRecipePage />
                         </ProtectedRoute>
                     }
                 />

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import './style.css';
 import Stepper from "../../components/stepper/Stepper";
-import StepOne from "./steps/StepOne";
-import StepTwo from "./steps/StepTwo";
-import StepThree from "./steps/StepThree";
+import StepOne from "../../components/recipeForm/steps/StepOne";
+import StepTwo from "../../components/recipeForm/steps/StepTwo";
+import StepThree from "../../components/recipeForm/steps/StepThree";
 import api from "../../service/apiClient";
 import { useNavigate } from "react-router-dom";
 

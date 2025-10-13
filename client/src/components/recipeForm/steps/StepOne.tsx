@@ -1,4 +1,5 @@
 import TagInput from "../Taginput";
+import "../style.css";
 
 interface StepOneProps {
   recipe: Recipe;

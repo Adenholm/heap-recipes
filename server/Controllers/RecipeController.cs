@@ -96,6 +96,7 @@ public class RecipesController : ControllerBase
     {
         var recipe = await _db.Recipes
             .Include(r => r.Ingredients)
+            .Include(r => r.Instructions)
             .Include(r => r.Tags)
             .FirstOrDefaultAsync(r => r.Id == id);
 

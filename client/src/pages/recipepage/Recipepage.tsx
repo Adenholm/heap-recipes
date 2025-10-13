@@ -63,8 +63,8 @@ const RecipePage = () => {
                 <div>
                     <div className="recipe-header">
                         <h1>{recipe.title}</h1>
-                        {isAuthenticated && <img src={editIcon} alt="Edit Recipe" className='icon'/>}
-                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon'/>}
+                        {isAuthenticated && <img src={editIcon} alt="Edit Recipe" className='icon' onClick={onEdit}/>}
+                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon' onClick={onDelete}/>}
 
                     </div>
                     

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HeapReacipesApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+abbaf45c471d4a406074c2b271bbda8d46d26a1c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0245eceb2baca5daed0b175f98e4dd5a9e68752d")]
 [assembly: System.Reflection.AssemblyProductAttribute("HeapReacipesApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HeapReacipesApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
