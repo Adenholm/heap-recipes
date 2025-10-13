@@ -1,13 +1,17 @@
 import "./RecipePage.css";
 
-import { useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import recipesRaw from "../../data/recipes.json";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import api from "../../service/apiClient";
+import { AuthContext } from "../../context/auth";
+import editIcon from '../../assets/images/edit.svg';
+import deleteIcon from '../../assets/images/delete.svg';
 
 const RecipePage = () => {
+    const {isAuthenticated} = useContext(AuthContext);
     const { id } = useParams<{ id: string }>();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         api.get(`/recipes/${id}`).then(response => {
@@ -20,6 +24,19 @@ const RecipePage = () => {
     if (!recipe) {
         return <div>Loading...</div>;
     }
+
+    const onDelete = () => {
+        api.delete(`/recipes/${id}`).then(response => {
+            console.log('Recipe deleted successfully');
+            navigate('/');
+        }).catch(error => {
+            console.error('Error deleting recipe:', error);
+        });
+    };
+
+    const onEdit = () => {
+        navigate(`/edit-recipe/${id}`);
+    };
 
     return (
         <div className="recipe-page">
@@ -44,7 +61,12 @@ const RecipePage = () => {
                 </aside>
 
                 <div>
-                    <h1>{recipe.title}</h1>
+                    <div className="recipe-header">
+                        <h1>{recipe.title}</h1>
+                        {isAuthenticated && <img src={editIcon} alt="Edit Recipe" className='icon'/>}
+                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon'/>}
+
+                    </div>
                     
                     <div className="recipe-details">
                         <p>{recipe.prepTime} min</p>

@@ -24,7 +24,7 @@
     top: 2rem;
     left: 2rem;
 
-    color: #000;
+    color: #ffffff;
     height: fit-content;
 }
 
@@ -33,4 +33,22 @@
     flex-direction: row;
     justify-content: flex-start;
     gap: 1rem;
+}
+
+.recipe-header {
+    display: grid;
+    grid-template-columns: 1fr 2em 2em;
+    gap: 1rem;
+    align-items: center;
+}
+
+.recipe-header img {
+    width: 2em;
+    height: 2em;
+    cursor: pointer;
+}
+
+.recipe-page ol li {
+    margin-bottom: 1rem;
+    font-weight: 350;
 }
