@@ -5,3 +5,25 @@
     flex-direction: column;
     min-height: 100vh;
 }
+
+/* variables */
+:root {
+  --color-green: #3a5018;
+  --color-green1: #8EA16F;
+  --color-green2: #c6cf9c;
+  --color-green5: #e4ebc7;
+  --color-green7: #fdfff5;
+  --color-offwhite: rgb(255, 251, 240);
+  --color-lightgrey: #f5f5f5;
+  --color-rederror: #e44646;
+}
+
+button {
+    font-family: 'Josefin Sans', sans-serif;
+    background-color: #8EA16F;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+}

@@ -1,6 +1,6 @@
 
 .recipe-container {
-    background-color: aliceblue;
+    background-color: var(--color-offwhite);
     display: flex;
     flex-direction: row;
     gap: 2rem;

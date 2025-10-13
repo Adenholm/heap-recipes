@@ -5,7 +5,7 @@ const style = {
     top: '14%',
     width: '240px',
     borderRadius: '20px',
-    backgroundColor: '#f6f7e5ff'
+    backgroundColor: 'var(--color-offwhite)',
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.75)'
