@@ -1,6 +1,7 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import api from "../service/apiClient";
 import { ReactNode } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 
 interface AuthContextType {
   token: string | null;
@@ -57,3 +58,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const auth = useContext(AuthContext);
+  const location = useLocation();
+
+  if (!auth) {
+    throw new Error('ProtectedRoute must be used within an AuthProvider');
+  }
+
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  return <>{children}</>;
+}

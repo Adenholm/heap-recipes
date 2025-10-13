@@ -45,7 +45,7 @@ const AddRecipePage = () => {
         const newRecipe = {
             ...recipe,
             ingredients: ingredients.filter(ing => ing.name.trim() !== ""),
-            tags: tags.map(tag => ({ name: tag.value }))
+            tags: tags.map(tag => ({ name: tag.label }))
         };
         api.post('/recipes', newRecipe)
             .then(response => {
