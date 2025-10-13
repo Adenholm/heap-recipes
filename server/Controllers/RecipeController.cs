@@ -19,6 +19,7 @@ public class RecipesController : ControllerBase
         return await _db.Recipes
             .Include(r => r.Tags)
             .Include(r => r.Ingredients)
+            .Include(r => r.Instructions)
             .ToListAsync();
     }
 
@@ -28,6 +29,7 @@ public class RecipesController : ControllerBase
         var recipe = await _db.Recipes
             .Include(r => r.Tags)
             .Include(r => r.Ingredients)
+            .Include(r => r.Instructions)
             .FirstOrDefaultAsync(r => r.Id == id);
 
         return recipe is null ? NotFound() : recipe;
@@ -44,7 +46,6 @@ public class RecipesController : ControllerBase
             ImageUrl = dto.ImageUrl,
             PrepTime = dto.PrepTime,
             Servings = dto.Servings,
-            Instructions = dto.Instructions
         };
 
         // Handle ingredients
@@ -54,6 +55,14 @@ public class RecipesController : ControllerBase
             {
                 Name = ingDto.Name,
                 Quantity = ingDto.Quantity
+            }).ToList();
+
+        // Handle instructions
+        recipe.Instructions = dto.Instructions
+            .Where(inst => !string.IsNullOrWhiteSpace(inst.Text))
+            .Select(instDto => new Instruction
+            {
+                Text = instDto.Text
             }).ToList();
 
         // Handle tags
@@ -98,7 +107,6 @@ public class RecipesController : ControllerBase
         recipe.ImageUrl = dto.ImageUrl;
         recipe.PrepTime = dto.PrepTime;
         recipe.Servings = dto.Servings;
-        recipe.Instructions = dto.Instructions;
 
         // --- INGREDIENTS ---
         var dtoIngredientIds = dto.Ingredients
@@ -129,6 +137,37 @@ public class RecipesController : ControllerBase
                 {
                     Name = ingDto.Name,
                     Quantity = ingDto.Quantity,
+                    RecipeId = recipe.Id
+                });
+            }
+        }
+
+        // --- INSTRUCTIONS ---
+        var dtoInstructionIds = dto.Instructions
+            .Where(i => i.Id.HasValue)
+            .Select(i => i.Id.Value)
+            .ToHashSet();
+
+        var instructionsToRemove = recipe.Instructions
+            .Where(i => !dtoInstructionIds.Contains(i.Id))
+            .ToList();
+        foreach (var inst in instructionsToRemove)
+        {
+            recipe.Instructions.Remove(inst);
+        } 
+        foreach (var instDto in dto.Instructions)
+        {
+            var existingInst = recipe.Instructions.FirstOrDefault(i => i.Id == instDto.Id);
+
+            if (existingInst != null)
+            {
+                existingInst.Text = instDto.Text;
+            }
+            else
+            {
+                recipe.Instructions.Add(new Instruction
+                {
+                    Text = instDto.Text,
                     RecipeId = recipe.Id
                 });
             }

@@ -20,9 +20,9 @@ public class Recipe
 
     public int? Servings { get; set; }
 
-    public string Instructions { get; set; } = default!;
-
     public ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
+
+    public ICollection<Instruction> Instructions { get; set; } = new List<Instruction>();
     
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }
@@ -38,6 +38,15 @@ public class Ingredient
     public Recipe? Recipe { get; set; }
 }
 
+public class Instruction
+{
+    public int Id { get; set; }
+    public string Text { get; set; } = default!;
+
+    public int RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
+}
+
 public class Tag
 {
     public int Id { get; set; }
@@ -45,3 +54,4 @@ public class Tag
 
     public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
 }
+

@@ -54,7 +54,11 @@ const RecipePage = () => {
                         <p>{recipe.tags.map(tag => tag.name).join(", ")}</p>
                     </div>
 
-                    <p>{recipe.instructions}</p>
+                    <ol>
+                        {recipe.instructions.map((instruction, index) => (
+                            <li key={index}>{instruction.text}</li>
+                        ))}
+                    </ol>
                 </div>
             </div>
         </div>

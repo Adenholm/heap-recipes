@@ -1,19 +1,14 @@
+import InstructionInput from "../InstructionsInput";
+
 interface StepThreeProps {
-  recipe: Recipe;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  instructions: Instruction[];
+  setInstructions: React.Dispatch<React.SetStateAction<Instruction[]>>;
 }
 
-const StepThree = ({ recipe, handleChange }: StepThreeProps) => {
+const StepThree = ({ instructions, setInstructions }: StepThreeProps) => {
   return (
     <form>
-        <label htmlFor="instructions">Instructions:</label>
-        <textarea
-            id="instructions"
-            name="instructions"
-            value={recipe.instructions}
-            onChange={handleChange}
-            required
-        />
+        <InstructionInput instructions={instructions} setInstructions={setInstructions} />
     </form>
   );
 };

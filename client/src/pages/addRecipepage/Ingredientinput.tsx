@@ -29,7 +29,7 @@ const IngredientInput = ({ ingredients, setIngredients }: IngredientInputProps) 
 
   return (
     <div>
-      <label>Ingredients</label>
+      <h3>Ingredients</h3>
       {ingredients.map((ingredient, index) => (
         <div key={index} className="ingredient-row">
           <input

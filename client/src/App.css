@@ -27,3 +27,10 @@ button {
     border-radius: 6px;
     cursor: pointer;
 }
+
+textarea {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 400px;
+}

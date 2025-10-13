@@ -1,7 +1,5 @@
 import { useState } from "react";
 import './style.css';
-import IngredientInput from "./Ingredientinput";
-import TagInput from "./Taginput";
 import Stepper from "../../components/stepper/Stepper";
 import StepOne from "./steps/StepOne";
 import StepTwo from "./steps/StepTwo";
@@ -15,7 +13,7 @@ const AddRecipePage = () => {
         title: '',
         description: '',
         ingredients: [],
-        instructions: '',
+        instructions: [],
         prepTime: 0,
         servings: 0,
         tags: [],
@@ -24,6 +22,10 @@ const AddRecipePage = () => {
 
     const [ingredients, setIngredients] = useState<Ingredient[]>([
         { quantity: "", name: "" },
+    ]);
+
+    const [instructions, setInstructions] = useState<Instruction[]>([
+        { text: "" },
     ]);
 
     const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
@@ -45,6 +47,7 @@ const AddRecipePage = () => {
         const newRecipe = {
             ...recipe,
             ingredients: ingredients.filter(ing => ing.name.trim() !== ""),
+            instructions: instructions.filter(inst => inst.text.trim() !== ""),
             tags: tags.map(tag => ({ name: tag.label }))
         };
         api.post('/recipes', newRecipe)
@@ -63,7 +66,7 @@ const AddRecipePage = () => {
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />
                     <StepTwo ingredients={ingredients} setIngredients={setIngredients} />
-                    <StepThree recipe={recipe} handleChange={handleChange} />
+                    <StepThree instructions={instructions} setInstructions={setInstructions} />
             </Stepper>
         </div>
     );
