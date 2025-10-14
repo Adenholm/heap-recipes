@@ -46,9 +46,38 @@
     width: 2em;
     height: 2em;
     cursor: pointer;
+    padding: 0.25em;
+    border-radius: 0.5em;
 }
 
 .recipe-page ol li {
     margin-bottom: 1rem;
     font-weight: 350;
+}
+
+.icon {
+        background-color: var(--color-green1);
+}
+
+.delete-button {
+    background-color: var(--color-rederror);
+}
+
+@media (max-width: 768px) {
+    .recipe-container {
+        flex-direction: column;
+        align-items: center;
+        max-width: 90%;
+        padding: 1rem;
+    }
+
+    .recipe-page .recipe-image {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .recipe-header {
+        grid-template-columns: 1fr 2em 2em;
+        gap: 0.5rem;
+    }
 }

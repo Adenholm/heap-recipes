@@ -54,6 +54,7 @@ const StepOne = ({ recipe, handleChange, tags, setTags }: StepOneProps) => {
                 required
             />
         </div>
+        <TagInput selectedTags={tags} setSelectedTags={setTags} />
         <div>
             <label htmlFor="imageUrl">Image URL:</label>
             <input
@@ -68,7 +69,6 @@ const StepOne = ({ recipe, handleChange, tags, setTags }: StepOneProps) => {
             <label htmlFor="imagePreview">Image Preview:</label>
         <img src={recipe.imageUrl || 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600'} alt="Image Preview" className="image-preview" />
         </div>
-        <TagInput selectedTags={tags} setSelectedTags={setTags} />
     </form>
   );
 };

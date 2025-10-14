@@ -5,3 +5,10 @@
     padding: 2rem;
     border-radius: 1rem;
 }
+
+@media (max-width: 768px) {
+    .add-container {
+        width: 90%;
+        padding: 1rem;
+    }
+}

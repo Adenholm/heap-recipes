@@ -4,8 +4,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import api from "../../service/apiClient";
 import { AuthContext } from "../../context/auth";
-import editIcon from '../../assets/images/edit.svg';
-import deleteIcon from '../../assets/images/delete.svg';
+import editIcon from '../../assets/images/edit-white.svg';
+import deleteIcon from '../../assets/images/delete-white.svg';
 
 const RecipePage = () => {
     const {isAuthenticated} = useContext(AuthContext);
@@ -64,7 +64,7 @@ const RecipePage = () => {
                     <div className="recipe-header">
                         <h1>{recipe.title}</h1>
                         {isAuthenticated && <img src={editIcon} alt="Edit Recipe" className='icon' onClick={onEdit}/>}
-                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon' onClick={onDelete}/>}
+                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon delete-button' onClick={onDelete}/>}
 
                     </div>
                     

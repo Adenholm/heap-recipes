@@ -38,6 +38,7 @@ const InstructionInput = ({ instructions, setInstructions }: InstructionInputPro
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               handleChange(index, "text", e.target.value)
             }
+            className="instruction-textarea"
           />
           <button
             type="button"

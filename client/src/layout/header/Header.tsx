@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import './Header.css';
 
 import ramen from '../../assets/images/ramen.svg';
@@ -13,6 +13,7 @@ import { AuthContext } from '../../context/auth';
 const Header = () => {
     const { openModal, setModal } = useContext(ModalContext);
     const { isAuthenticated, onLogout } = useContext(AuthContext);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const showLoginModal = () => {
         setModal('Login', <LoginModal/>);
@@ -36,10 +37,26 @@ const Header = () => {
                     <Link to="/add-recipe">
                         <img src={addRecipe} alt="Add Recipe" className='icon'/>
                     </Link>
-                    <img src={account} alt="" aria-hidden="true" className='icon' onClick={onLogout}/>
-                </div>}
+                    <img src={account} alt="" aria-hidden="true" className='icon' onClick={ () => setMenuOpen(!menuOpen) }/>
+                    { menuOpen && <Menu onLogout={onLogout} /> }
+                </div>
+                }
         </header>
         )
 };
 
 export default Header;
+
+
+
+const Menu = ({ onLogout }: { onLogout: () => void }) => {
+    return (
+        <nav className='menu'>
+            <ul>
+                <li><Link to="/edit-tags">Edit tags</Link></li>
+                <li><hr className="menu-divider" /></li>
+                <li onClick={onLogout}>Log out</li>
+            </ul>
+        </nav>
+    );
+};

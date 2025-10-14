@@ -54,3 +54,27 @@
     background-color: var(--color-green);
     color: white;
 }
+
+@media (max-width: 768px) {
+    
+    .search-bar {
+        align-self: center;
+        width: 90%;
+        margin: 0 0;
+        position: sticky;
+    }
+
+    .tag-filters {
+        width: 90%;
+        justify-content: center;
+        margin: 0;
+        align-self: center;
+    }
+
+    .recipe-list {
+        justify-content: center;
+        margin: 2rem 0;
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+}
