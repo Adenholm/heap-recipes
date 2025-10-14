@@ -74,7 +74,17 @@
     .recipe-list {
         justify-content: center;
         margin: 2rem 0;
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 535px) {
+    .recipe-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+        justify-content: center;
         gap: 1rem;
+        margin: 1rem 0;
         padding: 0 1rem;
     }
 }

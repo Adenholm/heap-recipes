@@ -20,6 +20,12 @@
     font-size: 1rem;
     font-weight: 600;
     margin: 0.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .recipe-card p {
@@ -34,3 +40,16 @@
     transform: scale(1.05);
 }
 
+@media (max-width: 535px) {
+    .recipe-card {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .recipe-card img {
+        height: 8rem;
+    }
+    
+}
