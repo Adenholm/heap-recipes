@@ -42,10 +42,10 @@ const Stepper = ({
       {children[currentStep]}
       {errorMessage && <p className="error-message">{errorMessage}</p>}
       <div className="stepper-buttons">
-        <button className="offwhite" onClick={onBackClick}>Back</button>
+        {currentStep !== 0 ? <button className="back-button" onClick={onBackClick}>Back</button> : <div />}
         <button
           disabled={!stepCondition}
-          className="blue"
+          className="next-button"
           onClick={onNextClick}
         >
           {currentStep === children.length - 1 ? 'Submit' : 'Next'}

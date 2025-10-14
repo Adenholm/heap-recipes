@@ -5,8 +5,16 @@
   justify-content: space-between;
   margin-top: 40px;
 }
-.stepper-buttons button:nth-of-type(2) {
+.next-button{
   justify-self: end;
+}
+
+.back-button{
+  background-color: var(--color-green2);
+}
+
+.stepper-buttons button{
+  width: fit-content;
 }
 
 .error-message {

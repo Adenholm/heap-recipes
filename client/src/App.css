@@ -34,3 +34,9 @@ textarea {
     border-radius: 4px;
     width: 400px;
 }
+
+textarea:focus, input:focus, select:focus {
+    outline: none;
+    border-color: #8EA16F;
+    box-shadow: 0 0 5px rgba(142, 161, 111, 0.5);
+}
