@@ -40,3 +40,18 @@ textarea:focus, input:focus, select:focus {
     border-color: #8EA16F;
     box-shadow: 0 0 5px rgba(142, 161, 111, 0.5);
 }
+
+.container {
+    background-color: var(--color-offwhite);
+    width: 50%;
+    margin-inline: auto;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 1rem;
+    }
+}

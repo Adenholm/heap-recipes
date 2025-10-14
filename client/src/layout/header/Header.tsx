@@ -20,6 +20,18 @@ const Header = () => {
         openModal();
     };
 
+    const Menu = ({ onLogout }: { onLogout: () => void }) => {
+    return (
+        <nav className='menu'>
+            <ul>
+                <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">Edit tags</Link></li>
+                <li><hr className="menu-divider" /></li>
+                <li onClick={onLogout}>Log out</li>
+            </ul>
+        </nav>
+    );
+    };
+
         return (
         <header className='page-header'>
             <div className="section">
@@ -46,17 +58,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-
-const Menu = ({ onLogout }: { onLogout: () => void }) => {
-    return (
-        <nav className='menu'>
-            <ul>
-                <li><Link to="/edit-tags">Edit tags</Link></li>
-                <li><hr className="menu-divider" /></li>
-                <li onClick={onLogout}>Log out</li>
-            </ul>
-        </nav>
-    );
-};

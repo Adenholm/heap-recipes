@@ -10,6 +10,7 @@ import Modal from './components/modal/modal'
 import AddRecipePage from './pages/addRecipepage/AddRecipepage'
 import EditRecipePage from './pages/editRecipepage/EditRecipePage'
 import { ProtectedRoute } from './context/auth'
+import EditTagsPage from './pages/editTagspage/EditTagspage'
 
 function App() {
 
@@ -33,6 +34,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <EditRecipePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path='/edit-tags/'
+                    element={
+                        <ProtectedRoute>
+                            <EditTagsPage />
                         </ProtectedRoute>
                     }
                 />
