@@ -1,7 +1,7 @@
 import recipesRaw from '../../data/recipes.json';
 import './Mainpage.css';
 
-import RecipeCard from '../../components/recipecard/RecipeCard';
+import RecipeCard from '../../components/recipeCard/RecipeCard';
 import { useEffect, useState } from 'react';
 import api from '../../service/apiClient';
 import searchIcon from '../../assets/images/search.svg';

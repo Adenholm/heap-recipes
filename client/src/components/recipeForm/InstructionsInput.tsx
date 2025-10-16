@@ -54,7 +54,7 @@ const InstructionInput = ({ instructions, setInstructions }: InstructionInputPro
         onClick={addInstruction}
         className="add-btn"
       >
-        + Add Instruction
+        + Add Step
       </button>
     </div>
   );

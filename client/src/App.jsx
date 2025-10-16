@@ -2,7 +2,7 @@ import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import Mainpage from './pages/mainpage/Mainpage'
-import Recipepage from './pages/recipePage/RecipePage'
+import Recipepage from './pages/recipepage/Recipepage'
 
 import Header from './layout/header/Header'
 import Footer from './layout/footer/Footer'
@@ -15,7 +15,7 @@ import EditTagsPage from './pages/editTagspage/EditTagspage'
 function App() {
 
     return (
-        <BrowserRouter basename='/heap-recipes/'>
+        <BrowserRouter>
             <Header />
             <Modal />
             <Routes>

@@ -1,5 +1,5 @@
 
-import Steps from './steps';
+import Steps from './Steps';
 import './style.css';
 import { useState } from 'react';
 
