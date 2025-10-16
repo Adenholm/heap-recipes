@@ -13,7 +13,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(opts =>
 
 // Configure JWT options
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
+var jwtKey = jwtSection["Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    Console.WriteLine("⚠️ Warning: JWT key not set. Using temporary key for CI/CD.");
+    jwtKey = "=temporary-ci-key="; // safe fallback for CI
+}
+var key = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

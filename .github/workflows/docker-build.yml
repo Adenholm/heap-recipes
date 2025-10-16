@@ -40,6 +40,7 @@ jobs:
       - name: Run test stack
         env:
           DATABASE_URL: ${{ secrets.DB_CONNECTION_STRING }}
+          JWT__Key: ${{ secrets.JWT_KEY }}
         run: |
           docker compose up -d
           echo "Waiting for backend to be ready..."

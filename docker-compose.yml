@@ -7,6 +7,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=${DATABASE_URL}
+      - JWT__Key=${JWT__Key}
       - AllowedOrigins=http://localhost:3000;https://your-production-domain.com
     depends_on:
       - frontend
