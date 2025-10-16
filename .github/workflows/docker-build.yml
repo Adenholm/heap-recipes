@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      BACKEND_IMAGE: Adenholm/heap-recipes-backend
-      FRONTEND_IMAGE: Adenholm/heap-recipes-frontend
+      BACKEND_IMAGE: adenholm/heap-recipes-backend
+      FRONTEND_IMAGE: adenholm/heap-recipes-frontend
       SHA_TAG: ${{ github.sha }}
 
     steps:
