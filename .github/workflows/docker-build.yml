@@ -1,4 +1,4 @@
-name: Build and Push Docker Images
+name: Build, Test, and Push Docker Images
 
 on:
   push:
@@ -6,38 +6,73 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-test-push:
     runs-on: ubuntu-latest
 
     env:
+      DOCKER_USER: adenholm 
       BACKEND_IMAGE: adenholm/heap-recipes-backend
       FRONTEND_IMAGE: adenholm/heap-recipes-frontend
       SHA_TAG: ${{ github.sha }}
 
     steps:
-      # 1. Checkout repository
+      # 1️⃣ Checkout repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Log in to DockerHub
+      # 2️⃣ Login to Docker Hub
       - name: Docker login
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 3. Build and push backend image
+      # 3️⃣ Build both images (backend + frontend)
       - name: Build backend image
         run: |
-          docker build -t $BACKEND_IMAGE:latest ./server
-          docker build -t $BACKEND_IMAGE:$SHA_TAG ./server
+          docker build -t $BACKEND_IMAGE:latest -t $BACKEND_IMAGE:$SHA_TAG ./server
+
+      - name: Build frontend image
+        run: |
+          docker build -t $FRONTEND_IMAGE:latest -t $FRONTEND_IMAGE:$SHA_TAG ./client
+
+      # 4️⃣ Test the stack locally with docker-compose
+      - name: Run test stack
+        run: |
+          docker compose up -d
+          echo "Waiting for backend to be ready..."
+          for i in {1..20}; do
+            if curl -s http://localhost:8080/health > /dev/null; then
+              echo "✅ Backend healthy!"
+              break
+            fi
+            echo "Waiting... ($i)"
+            sleep 3
+          done
+          docker compose logs backend || true
+          docker compose ps
+
+      # 5️⃣ Verify containers are running
+      - name: Check containers
+        run: |
+          RUNNING=$(docker ps -q | wc -l)
+          if [ "$RUNNING" -lt 2 ]; then
+            echo "❌ Not all containers are running"
+            exit 1
+          fi
+          echo "✅ Containers are running fine."
+
+      # 6️⃣ Shut down test stack
+      - name: Stop test containers
+        run: docker compose down
+
+      # 7️⃣ Push to Docker Hub (only if tests passed)
+      - name: Push backend image
+        run: |
           docker push $BACKEND_IMAGE:latest
           docker push $BACKEND_IMAGE:$SHA_TAG
 
-      # 4. Build and push frontend image
-      - name: Build frontend image
+      - name: Push frontend image
         run: |
-          docker build -t $FRONTEND_IMAGE:latest ./client
-          docker build -t $FRONTEND_IMAGE:$SHA_TAG ./client
           docker push $FRONTEND_IMAGE:latest
           docker push $FRONTEND_IMAGE:$SHA_TAG
