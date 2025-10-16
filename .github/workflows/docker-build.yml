@@ -38,6 +38,8 @@ jobs:
 
       # 4️⃣ Test the stack locally with docker-compose
       - name: Run test stack
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
         run: |
           docker compose up -d
           echo "Waiting for backend to be ready..."
