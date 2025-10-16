@@ -1,0 +1,7 @@
+.edit-container {
+    background-color: var(--color-offwhite);
+    width: 50%;
+    margin-inline: auto;
+    padding: 2rem;
+    border-radius: 1rem;
+}

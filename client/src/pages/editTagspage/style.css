@@ -1,0 +1,30 @@
+.edit-tags ul{
+    list-style-type: none;
+    padding: 0;
+}
+.edit-tags li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.edit-tags input {
+    flex-grow: 1;
+    margin-right: 8px;
+}
+
+.edit-tags button {
+    background-color: var(--color-rederror);
+    color: white;
+    padding: 0.25rem 0.5rem;
+}
+
+.edit-tags img {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.edit-tags hr {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid #ccc;
+}

@@ -85,3 +85,10 @@ Thumbs.db
 
 # Optional stylelint cache
 .stylelintcache
+
+server/appsettings.json
+server/appsettings.Development.json
+
+server/obj/*
+server/bin/*
+.fake
