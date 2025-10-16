@@ -58,12 +58,10 @@ jobs:
       # 5️⃣ Verify containers are running
       - name: Check containers
         run: |
-          if [ "$RUNNING" -lt 1 ]; then
-          echo "❌ No containers are running at all"
-          docker compose logs
+          if [ "$RUNNING" -lt 2 ]; then
+          echo "❌ Not all containers are running"
           exit 1
           fi
-          echo "⚠️ Some containers exited early, continuing anyway..."
 
       # 6️⃣ Shut down test stack
       - name: Stop test containers
