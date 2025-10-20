@@ -30,7 +30,7 @@ const InstructionInput = ({ instructions, setInstructions }: InstructionInputPro
   return (
     <div>
       <h3>Instructions</h3>
-      {instructions.map((instruction, index) => (
+      {instructions.sort((a, b) => (a.id ?? 0) - (b.id ?? 0)).map((instruction, index) => (
         <div key={index} className="instruction-row">
           <textarea
             placeholder="eg. rinse the rice then ..."
