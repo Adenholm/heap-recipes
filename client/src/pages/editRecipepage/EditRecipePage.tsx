@@ -87,7 +87,7 @@ const EditRecipePage = () => {
     };
 
     return (
-        <div className="edit-container">
+        <div className="container">
             <h1>Edit Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />

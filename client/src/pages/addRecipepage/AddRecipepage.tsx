@@ -63,7 +63,7 @@ const AddRecipePage = () => {
     }
 
     return (
-        <div className="add-container">
+        <div className="container">
             <h1>Add Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />

@@ -49,9 +49,16 @@ textarea:focus, input:focus, select:focus {
     border-radius: 1rem;
 }
 
+@media (max-width: 1024px) {
+    .container {
+        width: 70%;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
-        width: 90%;
+        width: calc(100% - 2rem);
         padding: 1rem;
+        border-radius: 0rem;
     }
 }

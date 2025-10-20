@@ -11,7 +11,7 @@ import deleteIcon from '../../assets/images/delete-white.svg';
 import { useRecipes } from "../../context/recipes";
 
 const RecipePage = () => {
-    const { getRecipeById } = useRecipes();
+    const { getRecipeById, deleteRecipe } = useRecipes();
     const {isAuthenticated} = useContext(AuthContext);
     const { id } = useParams<{ id: string }>();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -35,7 +35,7 @@ const RecipePage = () => {
     }
 
     const onDelete = () => {
-        api.delete(`/recipes/${id}`).then(response => {
+        deleteRecipe(Number(id)).then(response => {
             console.log('Recipe deleted successfully');
             navigate('/');
         }).catch(error => {
