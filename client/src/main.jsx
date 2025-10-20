@@ -4,12 +4,15 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/auth.js'
 import { ModalProvider } from './context/modal.js'
+import { RecipesProvider } from './context/recipes.js'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <ModalProvider>
-        <App />
+        <RecipesProvider>
+          <App />
+        </RecipesProvider>
       </ModalProvider>
     </AuthProvider>
   </StrictMode>,

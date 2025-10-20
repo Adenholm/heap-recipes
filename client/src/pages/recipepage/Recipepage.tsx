@@ -4,21 +4,28 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import api from "../../service/apiClient";
 import { AuthContext } from "../../context/auth";
+// @ts-ignore: missing type declaration for SVG import
 import editIcon from '../../assets/images/edit-white.svg';
+// @ts-ignore: missing type declaration for SVG import
 import deleteIcon from '../../assets/images/delete-white.svg';
+import { useRecipes } from "../../context/recipes";
 
 const RecipePage = () => {
+    const { getRecipeById } = useRecipes();
     const {isAuthenticated} = useContext(AuthContext);
     const { id } = useParams<{ id: string }>();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        api.get(`/recipes/${id}`).then(response => {
-            setRecipe(response.data);
-        }).catch(error => {
-            console.error('Error fetching recipe:', error);
-        });
+        const fetchRecipe = async () => {
+            const existingRecipe = await getRecipeById(Number(id));
+            if (existingRecipe) {
+                setRecipe(existingRecipe);
+                return;
+            }
+        }
+        fetchRecipe();
     }, [id]);
 
     if (!recipe) {

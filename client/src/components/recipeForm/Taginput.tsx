@@ -2,6 +2,7 @@ import CreatableSelect from 'react-select/creatable';
 import { MultiValue, ActionMeta } from 'react-select';
 import api from "../../service/apiClient";
 import { useEffect, useState } from 'react';
+import { useRecipes } from '../../context/recipes';
 
 type TagOption = { value: string; label: string };
 
@@ -11,23 +12,20 @@ interface TagInputProps {
 }
 
 const TagInput = ({ selectedTags, setSelectedTags }: TagInputProps) => {
+    const { tags } = useRecipes();
     const [options, setOptions] = useState([
         { value: "vegan", label: "Vegan" }
     ]);
     
-    
-
     useEffect(() => {
-        api.get('/tags').then(response => {
-            const tagOptions = response.data.map((tag: Tag) => ({
+        if (tags.length > 0) {
+            const tagOptions = tags.map((tag: Tag) => ({
                 value: tag.name,
                 label: tag.name
             }));
             setOptions(tagOptions);
-        }).catch(error => {
-            console.error('Error fetching tags:', error);
-        });
-    }, []);
+        }
+    }, [tags]);
 
     const handleTagChange = (
         newValue: MultiValue<{ value: string; label: string }>,
