@@ -5,6 +5,8 @@ import ramen from '../../assets/images/ramen.svg';
 import login from '../../assets/images/login.svg';
 import account from '../../assets/images/account.svg';
 import addRecipe from '../../assets/images/add-recipe.svg';
+import tagIcon from '../../assets/images/tag.svg';
+import logout from '../../assets/images/logout.svg';
 import { Link } from 'react-router-dom';
 import { ModalContext } from '../../context/modal';
 import LoginModal from '../../components/loginModal/Login';
@@ -16,6 +18,7 @@ const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const showLoginModal = () => {
+        setMenuOpen(false);
         setModal('Login', <LoginModal/>);
         openModal();
     };
@@ -24,9 +27,12 @@ const Header = () => {
     return (
         <nav className='menu'>
             <ul>
-                <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">Edit tags</Link></li>
+                <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">
+                <img src={tagIcon} alt="Edit Tags" className='icon'/>
+                Edit tags
+                </Link></li>
                 <li><hr className="menu-divider" /></li>
-                <li onClick={onLogout}>Log out</li>
+                <li onClick={onLogout}><img src={logout} alt="Log Out" className='icon'/>Log out</li>
             </ul>
         </nav>
     );

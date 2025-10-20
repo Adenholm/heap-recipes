@@ -4,38 +4,46 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import api from "../../service/apiClient";
 import { AuthContext } from "../../context/auth";
+// @ts-ignore: missing type declaration for SVG import
 import editIcon from '../../assets/images/edit-white.svg';
+// @ts-ignore: missing type declaration for SVG import
 import deleteIcon from '../../assets/images/delete-white.svg';
+import { useRecipes } from "../../context/recipes";
+import { ModalContext } from "../../context/modal";
+import DeleteModal from "../../components/deleteModal/Delete";
 
 const RecipePage = () => {
+    const { getRecipeById } = useRecipes();
     const {isAuthenticated} = useContext(AuthContext);
     const { id } = useParams<{ id: string }>();
+    const { openModal, setModal } = useContext(ModalContext);
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        api.get(`/recipes/${id}`).then(response => {
-            setRecipe(response.data);
-        }).catch(error => {
-            console.error('Error fetching recipe:', error);
-        });
+        const fetchRecipe = async () => {
+            const existingRecipe = await getRecipeById(Number(id));
+            if (existingRecipe) {
+                existingRecipe.instructions.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+                existingRecipe.ingredients.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+                setRecipe(existingRecipe);
+                return;
+            }
+        }
+        fetchRecipe();
     }, [id]);
 
     if (!recipe) {
         return <div>Loading...</div>;
     }
 
-    const onDelete = () => {
-        api.delete(`/recipes/${id}`).then(response => {
-            console.log('Recipe deleted successfully');
-            navigate('/');
-        }).catch(error => {
-            console.error('Error deleting recipe:', error);
-        });
-    };
-
     const onEdit = () => {
         navigate(`/edit-recipe/${id}`);
+    };
+
+    const showDeleteModal = () => {
+        setModal('Delete', <DeleteModal recipeId={Number(id)} />);
+        openModal();
     };
 
     return (
@@ -64,7 +72,7 @@ const RecipePage = () => {
                     <div className="recipe-header">
                         <h1>{recipe.title}</h1>
                         {isAuthenticated && <img src={editIcon} alt="Edit Recipe" className='icon' onClick={onEdit}/>}
-                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon delete-button' onClick={onDelete}/>}
+                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon delete-button' onClick={showDeleteModal}/>}
 
                     </div>
                     

@@ -3,6 +3,7 @@ import { ModalContext } from '../../context/modal.js';
 import './style.css';
 import { useContext } from 'react';
 import style from './style.js';
+// @ts-ignore: missing type declaration for SVG import
 import closeIcon from '../../assets/images/close-black.svg';
 
 

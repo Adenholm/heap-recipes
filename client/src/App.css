@@ -15,7 +15,7 @@
   --color-green7: #fdfff5;
   --color-offwhite: rgb(255, 251, 240);
   --color-lightgrey: #f5f5f5;
-  --color-rederror: #e44646;
+  --color-rederror: #c56161;
 }
 
 button {
@@ -49,9 +49,16 @@ textarea:focus, input:focus, select:focus {
     border-radius: 1rem;
 }
 
+@media (max-width: 1024px) {
+    .container {
+        width: 70%;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
-        width: 90%;
-        padding: 1rem;
+        width: calc(100% - 2rem);
+        padding: 2rem 1rem;
+        border-radius: 0rem;
     }
 }

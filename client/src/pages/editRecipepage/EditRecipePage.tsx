@@ -6,9 +6,12 @@ import StepTwo from "../../components/recipeForm/steps/StepTwo";
 import StepThree from "../../components/recipeForm/steps/StepThree";
 import api from "../../service/apiClient";
 import { useNavigate, useParams } from "react-router-dom";
+import { useRecipes } from "../../context/recipes";
 
 const EditRecipePage = () => {
+    const { getRecipeById, editRecipe} = useRecipes();
     const { id } = useParams<{ id: string }>();
+    const [loading, setLoading] = useState<boolean>(true);
     const navigate = useNavigate();
     const [recipe, setRecipe] = useState<Recipe>({
         title: '',
@@ -32,17 +35,18 @@ const EditRecipePage = () => {
     const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
 
     useEffect(() => {
-        api.get(`/recipes/${id}`).then(response => {
-            setRecipe(response.data);
-            setIngredients(response.data.ingredients.length ? response.data.ingredients : [{ quantity: "", name: "" }]);
-            setInstructions(response.data.instructions.length ? response.data.instructions : [{ text: "" }]);
-            setTags(response.data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
-        }).catch(error => {
-            console.error('Error fetching recipe:', error);
-        });
-    }, [id]);
+        const fetchRecipe = async () => {
+            const data = await getRecipeById(Number(id));
+            setRecipe(data);
+            setIngredients(data.ingredients.length ? data.ingredients : [{ quantity: "", name: "" }]);
+            setInstructions(data.instructions.length ? data.instructions : [{ text: "" }]);
+            setTags(data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
+            setLoading(false);
+        };
+        fetchRecipe();
+    }, [id, getRecipeById]);
 
-    if (!recipe) {
+    if (loading || !recipe) {
         return <div>Loading...</div>;
     }
 
@@ -72,9 +76,9 @@ const EditRecipePage = () => {
         };
         console.log(updatedRecipe);
 
-        api.put(`/recipes/${id}`, updatedRecipe)
+        editRecipe(Number(id), updatedRecipe)
             .then(response => {
-                console.log('Recipe updated successfully:', response.data);
+                console.log('Recipe updated successfully:', response);
                 navigate('/recipe/' + id);
             })
             .catch(error => {
@@ -83,7 +87,7 @@ const EditRecipePage = () => {
     };
 
     return (
-        <div className="edit-container">
+        <div className="container">
             <h1>Edit Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />

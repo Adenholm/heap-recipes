@@ -6,8 +6,10 @@ import StepTwo from "../../components/recipeForm/steps/StepTwo";
 import StepThree from "../../components/recipeForm/steps/StepThree";
 import api from "../../service/apiClient";
 import { useNavigate } from "react-router-dom";
+import { useRecipes } from "../../context/recipes";
 
 const AddRecipePage = () => {
+    const { addRecipe} = useRecipes();
     const navigate = useNavigate();
     const [recipe, setRecipe] = useState<Recipe>({
         title: '',
@@ -50,9 +52,9 @@ const AddRecipePage = () => {
             instructions: instructions.filter(inst => inst.text.trim() !== ""),
             tags: tags.map(tag => ({ name: tag.label }))
         };
-        api.post('/recipes', newRecipe)
+        addRecipe(newRecipe)
             .then(response => {
-                console.log('Recipe added successfully:', response.data);
+                console.log('Recipe added successfully:', response);
                 navigate('/');
             })
             .catch(error => {
@@ -61,7 +63,7 @@ const AddRecipePage = () => {
     }
 
     return (
-        <div className="add-container">
+        <div className="container">
             <h1>Add Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />

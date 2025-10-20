@@ -10,7 +10,7 @@ interface StepOneProps {
 
 const StepOne = ({ recipe, handleChange, tags, setTags }: StepOneProps) => {
   return (
-    <form>
+    <form className="recipe-form">
         <div>
             <label htmlFor="title">Title:</label>
             <input
@@ -32,27 +32,29 @@ const StepOne = ({ recipe, handleChange, tags, setTags }: StepOneProps) => {
                 required
             />
         </div>
-        <div>
-            <label htmlFor="prepTime">Cooking Time (minutes):</label>
-            <input
-                type="number"
-                id="prepTime"
-                name="prepTime"
-                value={recipe.prepTime}
-                onChange={handleChange}
-                required
-            />
-        </div>
-        <div>
-            <label htmlFor="servings">Servings:</label>
-            <input
-                type="number"
-                id="servings"
-                name="servings"
-                value={recipe.servings}
-                onChange={handleChange}
-                required
-            />
+        <div className="two-input-row">
+            <div>
+                <label htmlFor="prepTime">Time (minutes):</label>
+                <input
+                    type="number"
+                    id="prepTime"
+                    name="prepTime"
+                    value={recipe.prepTime}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
+            <div>
+                <label htmlFor="servings">Servings:</label>
+                <input
+                    type="number"
+                    id="servings"
+                    name="servings"
+                    value={recipe.servings}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
         </div>
         <TagInput selectedTags={tags} setSelectedTags={setTags} />
         <div>

@@ -4,28 +4,19 @@ import './Mainpage.css';
 import RecipeCard from '../../components/recipeCard/RecipeCard';
 import { useEffect, useState } from 'react';
 import api from '../../service/apiClient';
+// @ts-ignore: missing type declaration for SVG import
 import searchIcon from '../../assets/images/search.svg';
+import { useRecipes } from '../../context/recipes';
 
 const Mainpage = () => {
-    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const { recipes, tags, loading, error } = useRecipes();
     const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
     const [search, setSearch] = useState<string>('');
-    const [tags, setTags] = useState<Tag[]>([]);
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
     useEffect(() => {
-        api.get('/recipes').then(response => {
-            setRecipes(response.data);
-            setFilteredRecipes(response.data);
-        }).catch(error => {
-            console.error('Error fetching recipes:', error);
-        });
-        api.get('/tags').then(response => {
-            setTags(response.data);
-        }).catch(error => {
-            console.error('Error fetching tags:', error);
-        });
-    }, []);
+        setFilteredRecipes(recipes);
+    }, [recipes]);
 
     const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
