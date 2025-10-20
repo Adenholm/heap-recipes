@@ -34,7 +34,7 @@ const StepOne = ({ recipe, handleChange, tags, setTags }: StepOneProps) => {
         </div>
         <div className="two-input-row">
             <div>
-                <label htmlFor="prepTime">Cooking Time (minutes):</label>
+                <label htmlFor="prepTime">Time (minutes):</label>
                 <input
                     type="number"
                     id="prepTime"

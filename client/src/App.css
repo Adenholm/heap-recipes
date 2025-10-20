@@ -58,7 +58,7 @@ textarea:focus, input:focus, select:focus {
 @media (max-width: 768px) {
     .container {
         width: calc(100% - 2rem);
-        padding: 1rem;
+        padding: 2rem 1rem;
         border-radius: 0rem;
     }
 }

@@ -72,4 +72,20 @@
     .instruction-textarea {
     width: 80%;
     }
+
+    .recipe-form input {
+      width: 90%;
+    }
+
+    .two-input-row {
+      display: flex;
+      gap: 1rem;
+      width: 95%;
+    }
+
+    .two-input-row input[type="number"] {
+        width: 90%;
+    }
+    
+    
 }
