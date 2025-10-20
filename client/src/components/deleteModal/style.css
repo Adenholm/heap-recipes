@@ -1,0 +1,9 @@
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.modal-buttons :last-child {
+  background-color: var(--color-rederror);
+}

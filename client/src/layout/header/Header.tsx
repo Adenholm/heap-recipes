@@ -16,6 +16,7 @@ const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const showLoginModal = () => {
+        setMenuOpen(false);
         setModal('Login', <LoginModal/>);
         openModal();
     };
