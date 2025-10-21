@@ -77,7 +77,7 @@ const RecipePage = () => {
     };
 
     const decrementPortions = () => {
-        if (portions > 1) {
+        if (portions > 2) {
             handlePortionsChange(portions - 2);
         }
     };
