@@ -102,6 +102,23 @@
     right: 2rem;
 }
 
+.ingredients-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+}
+
+.ingredients-header button {
+    width: 1.7rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    background-color: #fff;
+    color: var(--color-gray1);
+    margin-inline: 0.25rem;
+    border:#f8f0e0 1px solid;
+    border-radius: 50rem;
+}
+
 @media (max-width: 768px) {
     .recipe-container {
         flex-direction: column;
@@ -169,6 +186,10 @@
     border:#f8f0e0 1px solid;
     max-width: 560px;
     width: calc(100vw - 2rem);
+    }
+
+    .ingredients-header {
+        margin-right: 1rem;
     }
 
 }

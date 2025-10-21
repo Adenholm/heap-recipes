@@ -19,6 +19,7 @@ const RecipePage = () => {
     const { openModal, setModal } = useContext(ModalContext);
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [portions, setPortions] = useState(recipe?.servings || 4);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -39,6 +40,7 @@ const RecipePage = () => {
                 existingRecipe.instructions.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
                 existingRecipe.ingredients.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
                 setRecipe(existingRecipe);
+                setPortions(existingRecipe.servings);
                 return;
             }
         }
@@ -56,6 +58,28 @@ const RecipePage = () => {
     const showDeleteModal = () => {
         setModal('Delete', <DeleteModal recipeId={Number(id)} />);
         openModal();
+    };
+
+    const handlePortionsChange = (newPortions: number) => {
+        setRecipe(prevRecipe => {
+            if (!prevRecipe) return null;
+            const updatedIngredients = prevRecipe.ingredients.map(ingredient => ({
+                ...ingredient,
+                quantity: scaleQuantity(ingredient.quantity, newPortions / portions)
+            }));
+            setPortions(newPortions);
+            return { ...prevRecipe, ingredients: updatedIngredients };
+        });
+    };
+
+    const incrementPortions = () => {
+        handlePortionsChange(portions + 2);
+    };
+
+    const decrementPortions = () => {
+        if (portions > 1) {
+            handlePortionsChange(portions - 2);
+        }
     };
 
     const Header = () => (
@@ -92,7 +116,14 @@ const RecipePage = () => {
                         </span>
                     </Link>
 
-                    <h3>Ingredienser</h3>
+                    <div className="ingredients-header">
+                        <h3>Ingredienser</h3>
+                        <div className="portion-controls">
+                            <button onClick={decrementPortions}>-</button>
+                            <span>{portions}</span>
+                            <button onClick={incrementPortions}>+</button>
+                        </div>
+                    </div>
                     <ul>
                         {recipe.ingredients.map((ingredient, index) => (
                             <li key={index}><strong>{ingredient.quantity}</strong> <p>{ingredient.name}</p></li>
@@ -114,3 +145,43 @@ const RecipePage = () => {
 };
 
 export default RecipePage;
+
+
+function parseQuantity(str: string): number | null {
+  // Match "1 1/2", "1/2", "2.5", "1", etc.
+  const match = str.match(/(\d+\s\d+\/\d+|\d+\/\d+|\d+(\.\d+)?)/);
+  if (!match) return null;
+
+  const value = match[0];
+
+  // Handle mixed numbers like "1 1/2"
+  if (value.includes(" ")) {
+    const [whole, fraction] = value.split(" ");
+    const [num, denom] = fraction.split("/").map(Number);
+    return Number(whole) + num / denom;
+  }
+
+  // Handle fractions like "1/2"
+  if (value.includes("/")) {
+    const [num, denom] = value.split("/").map(Number);
+    return num / denom;
+  }
+
+  // Handle decimals and integers
+  return parseFloat(value);
+}
+
+function scaleQuantity(str: string, factor: number): string {
+  const num = parseQuantity(str);
+  if (num === null) return str; // no numeric part, return unchanged
+
+  // Extract the unit (everything after the number)
+  const unit = str.replace(/(\d+\s\d+\/\d+|\d+\/\d+|\d+(\.\d+)?)/, "").trim();
+
+  const scaled = num * factor;
+
+  // Round to a reasonable precision
+  const rounded = Math.round((scaled + Number.EPSILON) * 10) / 10;
+
+  return `${rounded} ${unit}`.trim();
+}
