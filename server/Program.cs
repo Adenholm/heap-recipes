@@ -52,6 +52,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.WebHost.UseUrls("http://0.0.0.0:8080");
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -86,6 +88,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
 }
 
 app.MapGet("/health", () => Results.Ok("Healthy!"));
