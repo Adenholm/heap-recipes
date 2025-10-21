@@ -18,7 +18,20 @@ const RecipePage = () => {
     const { id } = useParams<{ id: string }>();
     const { openModal, setModal } = useContext(ModalContext);
     const [recipe, setRecipe] = useState<Recipe | null>(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [portions, setPortions] = useState(recipe?.servings || 4);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     useEffect(() => {
         const fetchRecipe = async () => {
@@ -27,6 +40,7 @@ const RecipePage = () => {
                 existingRecipe.instructions.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
                 existingRecipe.ingredients.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
                 setRecipe(existingRecipe);
+                setPortions(existingRecipe.servings);
                 return;
             }
         }
@@ -46,10 +60,52 @@ const RecipePage = () => {
         openModal();
     };
 
+    const handlePortionsChange = (newPortions: number) => {
+        setRecipe(prevRecipe => {
+            if (!prevRecipe) return null;
+            const updatedIngredients = prevRecipe.ingredients.map(ingredient => ({
+                ...ingredient,
+                quantity: scaleQuantity(ingredient.quantity, newPortions / portions)
+            }));
+            setPortions(newPortions);
+            return { ...prevRecipe, ingredients: updatedIngredients };
+        });
+    };
+
+    const incrementPortions = () => {
+        handlePortionsChange(portions + 2);
+    };
+
+    const decrementPortions = () => {
+        if (portions > 2) {
+            handlePortionsChange(portions - 2);
+        }
+    };
+
+    const Header = () => (
+        <div>
+            <div className="recipe-header">
+                <h1>{recipe.title}</h1>
+            </div>
+            
+            <div className="recipe-details">
+                <p>{recipe.prepTime} min</p>
+                <p>|</p>
+                <p>{recipe.servings} portioner</p>
+                <p>|</p>
+                <p>{recipe.tags.map(tag => tag.name).join(", ")}</p>
+            </div>
+            <p className="recipe-description">{recipe.description}</p>
+        </div>
+    );
+    
     return (
         <div className="recipe-page">
 
             <div className="recipe-container">
+                {isAuthenticated && <img src={editIcon} alt="Edit Recipe" className='edit-buttons' onClick={onEdit}/>}
+                {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='edit-buttons delete-button' onClick={showDeleteModal}/>}
+                {isMobile && <Header />}
                 <aside>
                     <img className="recipe-image" src={recipe.imageUrl || 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600'} alt={recipe.title} >
                     </img>
@@ -60,30 +116,23 @@ const RecipePage = () => {
                         </span>
                     </Link>
 
-                    <h3>Ingredienser</h3>
+                    <div className="ingredients-header">
+                        <h3>Ingredienser</h3>
+                        <div className="portion-controls">
+                            <button onClick={decrementPortions}>-</button>
+                            <span>{portions}</span>
+                            <button onClick={incrementPortions}>+</button>
+                        </div>
+                    </div>
                     <ul>
                         {recipe.ingredients.map((ingredient, index) => (
-                            <li key={index}>{ingredient.quantity + " " + ingredient.name}</li>
+                            <li key={index}><strong>{ingredient.quantity}</strong> <p>{ingredient.name}</p></li>
                         ))}
                     </ul>
                 </aside>
-
                 <div>
-                    <div className="recipe-header">
-                        <h1>{recipe.title}</h1>
-                        {isAuthenticated && <img src={editIcon} alt="Edit Recipe" className='icon' onClick={onEdit}/>}
-                        {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='icon delete-button' onClick={showDeleteModal}/>}
-
-                    </div>
-                    
-                    <div className="recipe-details">
-                        <p>{recipe.prepTime} min</p>
-                        <p>|</p>
-                        <p>{recipe.servings} portioner</p>
-                        <p>|</p>
-                        <p>{recipe.tags.map(tag => tag.name).join(", ")}</p>
-                    </div>
-
+                    {!isMobile && <Header />}
+                    <h3>Instruktioner</h3>
                     <ol>
                         {recipe.instructions.map((instruction, index) => (
                             <li key={index}>{instruction.text}</li>
@@ -96,3 +145,43 @@ const RecipePage = () => {
 };
 
 export default RecipePage;
+
+
+function parseQuantity(str: string): number | null {
+  // Match "1 1/2", "1/2", "2.5", "1", etc.
+  const match = str.match(/(\d+\s\d+\/\d+|\d+\/\d+|\d+(\.\d+)?)/);
+  if (!match) return null;
+
+  const value = match[0];
+
+  // Handle mixed numbers like "1 1/2"
+  if (value.includes(" ")) {
+    const [whole, fraction] = value.split(" ");
+    const [num, denom] = fraction.split("/").map(Number);
+    return Number(whole) + num / denom;
+  }
+
+  // Handle fractions like "1/2"
+  if (value.includes("/")) {
+    const [num, denom] = value.split("/").map(Number);
+    return num / denom;
+  }
+
+  // Handle decimals and integers
+  return parseFloat(value);
+}
+
+function scaleQuantity(str: string, factor: number): string {
+  const num = parseQuantity(str);
+  if (num === null) return str; // no numeric part, return unchanged
+
+  // Extract the unit (everything after the number)
+  const unit = str.replace(/(\d+\s\d+\/\d+|\d+\/\d+|\d+(\.\d+)?)/, "").trim();
+
+  const scaled = num * factor;
+
+  // Round to a reasonable precision
+  const rounded = Math.round((scaled + Number.EPSILON) * 10) / 10;
+
+  return `${rounded} ${unit}`.trim();
+}

@@ -3,9 +3,12 @@
     background-color: #F0FFD9;
     border-radius: 1rem;
     width: auto;
+    max-width: 24rem;
     transition: 0.5s ease-in-out;
     text-decoration: none;
     color: rgb(27, 26, 26);
+    position: relative;
+    padding-bottom: 2rem;
 }
 
 .recipe-card img {
@@ -34,6 +37,9 @@
     margin-bottom: 1.2rem;
     color: rgb(88, 87, 87);
     font-weight: 500;
+    margin-top: auto;
+    position: absolute;
+    bottom: 0;
 }
 
 .recipe-card:hover {
