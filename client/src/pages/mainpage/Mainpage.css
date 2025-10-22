@@ -76,6 +76,10 @@
         margin: 2rem 0;
         padding: 0 1rem;
     }
+
+    .tag {
+        padding: 0.4rem 0.9rem;
+    }
 }
 
 @media (max-width: 544px) {

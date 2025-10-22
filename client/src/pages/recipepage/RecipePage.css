@@ -15,7 +15,7 @@
 }
 
 .recipe-page .recipe-image {
-    width: 15rem;
+    width: 17rem;
     border-radius: .5rem;
 }
 
@@ -23,7 +23,6 @@
     position: absolute;
     top: 2rem;
     left: 2rem;
-
     color: #ffffff;
     height: 2rem;
     width: 2rem;
@@ -45,7 +44,7 @@
 }
 
 .recipe-page ol li {
-   padding: 0.7rem 0.7rem;
+   padding: 0.7rem 0.3rem;
     font-weight: 350;
 }
 
@@ -54,7 +53,7 @@
     padding-left: 2rem;
     background-color: #fffefb;
     border-radius: 0.25rem;
-    border:#f8f0e0 1px solid;
+    border: #e7dcc4 1px solid;
 }
 
 .recipe-page ul{
@@ -62,7 +61,7 @@
     margin: 0;
     background-color: #fffefb;
     border-radius: 0.25rem;
-    border:#f8f0e0 1px solid;
+    border:#e7dcc4 1px solid;
 }
 
 .recipe-page ul li {
@@ -70,8 +69,8 @@
     list-style-type: none;
     padding: 0.25rem 1rem;
     display: grid;
-    grid-template-columns: 3rem 1fr;
-    gap: 1rem;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.25rem;
 }
 
 .recipe-page ul li p {
@@ -115,7 +114,7 @@
     background-color: #fff;
     color: var(--color-gray1);
     margin-inline: 0.25rem;
-    border:#f8f0e0 1px solid;
+    border:#dbcdb0 1px solid;
     border-radius: 50rem;
 }
 
@@ -180,12 +179,11 @@
 
     .recipe-page ol{
     padding:  1rem 0rem;
-    padding-left: 2rem;
+    padding-inline: 2.7rem 1rem;
     background-color: #fffefb;
     border-radius: 0.25rem;
-    border:#f8f0e0 1px solid;
-    max-width: 560px;
-    width: calc(100vw - 2rem);
+    max-width: 540px;
+    width: calc(100vw - 3.7rem);
     }
 
     .ingredients-header {
