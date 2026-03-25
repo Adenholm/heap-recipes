@@ -48,9 +48,9 @@ Thumbs.db
 .stylelintcache
 
 # Dotnet
-server/bin/
-server/obj/
-server/appsettings.Development.json
+bin/
+obj/
+appsettings.Development.json
 
 # Optional: ignore sensitive env files, keep .env.example
 .env
