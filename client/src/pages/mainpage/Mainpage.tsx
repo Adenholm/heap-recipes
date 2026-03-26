@@ -48,6 +48,20 @@ const Mainpage = () => {
         }
     };
 
+    const MainContent = () => {
+        if (loading) return <p className='no-recipes-text'>Loading recipes...</p>;
+        else if (recipes.length === 0) return <p className='no-recipes-text'>No recipes found.</p>;
+        else if (error)  return <p className='no-recipes-text'>Error loading recipes: {error}</p>;
+        else return (            
+            <ul className='recipe-list'>
+                {filteredRecipes.map((recipe: Recipe) => (
+                    <RecipeCard key={recipe.id} recipe={recipe} />
+                ))}
+            </ul>
+        )
+    }
+
+
     return (
         <>
             <div className='search-bar'>
@@ -72,11 +86,8 @@ const Mainpage = () => {
                     </button>
                 ))}
             </div>
-            <ul className='recipe-list'>
-                {filteredRecipes.map((recipe: Recipe) => (
-                    <RecipeCard key={recipe.id} recipe={recipe} />
-                ))}
-            </ul>
+
+            <MainContent />
         </>
     );
 };

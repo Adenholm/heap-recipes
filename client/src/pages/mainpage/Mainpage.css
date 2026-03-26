@@ -55,6 +55,12 @@
     color: white;
 }
 
+.no-recipes-text {
+    text-align: center;
+    color: var(--color-green);
+    margin-top: 2rem;
+}
+
 @media (max-width: 768px) {
     
     .search-bar {
