@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
-import { AuthProvider } from './context/auth.js'
-import { ModalProvider } from './context/modal.js'
-import { RecipesProvider } from './context/recipes.js'
+import App from './App.tsx'
+import { AuthProvider } from './context/auth'
+import { ModalProvider } from './context/modal'
+import { RecipesProvider } from './context/recipes'
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
       <ModalProvider>
@@ -15,5 +15,5 @@ createRoot(document.getElementById('root')).render(
         </RecipesProvider>
       </ModalProvider>
     </AuthProvider>
-  </StrictMode>,
+  </StrictMode>
 )
