@@ -1,7 +1,7 @@
 # Heap-recipes
 [![Last Commit][last-commit-shield]][last-commit-url]
 [![Repo Size][repo-size-shield]][repo-size-url]
-[![Author1][author-shield1]][author-url2]
+[![Author1][author-shield1]][author-url1]
 [![Author2][author-shield2]][author-url2]
 
 Heap-recipes is a simple recipe website developed by <a href="https://github.com/adenholm">Hanna Adenholm</a> and <a href="https://github.com/erikpersson0884">Erik Persson</a>.
@@ -16,49 +16,75 @@ Heap-recipes is a simple recipe website developed by <a href="https://github.com
 <!-- ![Vitest][vitest-shield] -->
 
 
-# Setup
+# Getting Started
 Based on experience from Erik Persson setting it up from scratch in March 2026. A improved tutorial will come soon (hopefully)
 
-1. install packges 
+## 1. Install dependencies
 
-```
- npm install
- npm run setup
+```bash
+npm install
+npm run setup
 ``` 
 
-2. start database
-```
+2. Start the database
+```bash
 docker compose up db
 ```
 
-3. configuration - add server/appsettings.json
-```
+3. Backend configuration
+
+Create the file: `server/appsettings.json`
+
+Replace YOUR_USERNAME and A_STRONG_PASSWORD with your PostgreSQL credentials.
+```json
 {
-    "ConnectionStrings": {
-        "DefaultConnection": "Host=localhost;Port=5432;Database=heap_recipes;Username=heap_user;Password=superduperpassword"
-    },
-    "Jwt": {
-        "Key": "dev-secret-key-12345678901234567890", 
-        "Issuer": "HeapRecipesApi",
-        "Audience": "HeapRecipesApiUsers",
-        "ExpireMinutes": "60"
-    }
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=heap_recipes;Username=YOUR_USERNAME;Password=A_STRONG_PASSWORD"
+  },
+  "Jwt": {
+    "Key": "dev-secret-key-12345678901234567890",
+    "Issuer": "HeapRecipesApi",
+    "Audience": "HeapRecipesApiUsers",
+    "ExpireMinutes": "60"
+  }
 }
 ```
 
-4. to create a user send a post call to the ´api/auth/register´ endpoint with the following body: 
+4. Frontend configuration (optional)
+
+```bash
+cp .env.example .env
+```
+Available variables:
+
+- `VITE_API_BASE_URL`: 
+    - Base URL for the backend API 
+    - Optional: defaults to /api (handled via proxy)
+    - Must start with VITE_ to be accessible in Vite
+
+
+
+5. Create a user
+
+Send a POST request to: `/api/auth/register`
+
+Example request body:
+
 ```
 {
-    "id": 1,
-    "username": "Hanna (for example)"
+  "id": 1,
+  "username": "Hanna"
 }
 ```
 
 
-# Info
+# Notes
 
-What types/roles of users are there? 
-* User
+* JWT Tokens uses HS256 and must therefore be at least 32 characters, otherwise it will not work (and be insecure)
+
+
+
+
 
 
 
