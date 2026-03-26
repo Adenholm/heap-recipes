@@ -1,14 +1,23 @@
 
 
 .page-footer {
-    color: white;
+    color: #fff;
 
-    width: fit-content;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    width: 100%;
     margin-top: auto;
-    margin-inline: auto;
 }
 
 .page-footer a {
     text-decoration: inherit;
     color: inherit;
+}
+
+.github-link {
+    position: absolute;
+    right: 0px;
+    padding: 1rem 4rem;
 }
