@@ -1,5 +1,6 @@
 import TagInput from "../Taginput";
 import "../style.css";
+import placeHolderImage from '@/assets/images/ramen-black.svg'
 
 interface StepOneProps {
   recipe: Recipe;
@@ -69,7 +70,7 @@ const StepOne = ({ recipe, handleChange, tags, setTags }: StepOneProps) => {
         </div>
         <div>
             <label htmlFor="imagePreview">Image Preview:</label>
-        <img src={recipe.imageUrl || 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600'} alt="Image Preview" className="image-preview" />
+        <img src={recipe.imageUrl || placeHolderImage} alt="Image Preview" className="image-preview" />
         </div>
     </form>
   );

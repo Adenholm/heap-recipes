@@ -2,15 +2,14 @@ import "./RecipePage.css";
 
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import api from "../../service/apiClient";
 import { AuthContext } from "../../context/auth";
-// @ts-ignore: missing type declaration for SVG import
 import editIcon from '../../assets/images/edit-white.svg';
-// @ts-ignore: missing type declaration for SVG import
 import deleteIcon from '../../assets/images/delete-white.svg';
 import { useRecipes } from "../../context/recipes";
 import { ModalContext } from "../../context/modal";
 import DeleteModal from "../../components/deleteModal/Delete";
+import placeHolderImage from '@/assets/images/ramen-black.svg'
+
 
 const RecipePage = () => {
     const { getRecipeById } = useRecipes();
@@ -107,7 +106,7 @@ const RecipePage = () => {
                 {isAuthenticated && <img src={deleteIcon} alt="Delete Recipe" className='edit-buttons delete-button' onClick={showDeleteModal}/>}
                 {isMobile && <Header />}
                 <aside>
-                    <img className="recipe-image" src={recipe.imageUrl || 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600'} alt={recipe.title} >
+                    <img className="recipe-image" src={recipe.imageUrl || placeHolderImage} alt={recipe.title} >
                     </img>
 
                     <Link to="/" className="back-arrow">
