@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "typeRoots": ["./src/types", "./node_modules/@types"],
+        "allowImportingTsExtensions": true,
+        "strict": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "types": ["node"],
+        "module": "es2015",
+        "moduleResolution": "bundler",
+        "forceConsistentCasingInFileNames": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": [
+        "src",
+        "src/types"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

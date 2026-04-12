@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import ReactDOM from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
+import App from './App.js'
 import { AuthProvider } from './context/auth.js'
 import { ModalProvider } from './context/modal.js'
 import { RecipesProvider } from './context/recipes.js'
 
-createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
       <ModalProvider>
