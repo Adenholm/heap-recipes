@@ -118,11 +118,12 @@ public class RecipesController : ControllerBase
             recipe.IngredientSections.Add(section);
         }
 
-        foreach (var instruction in dto.Instructions.Where(inst => !string.IsNullOrWhiteSpace(inst.Text)))
+        foreach (var instruction in dto.Instructions.Where(inst => !string.IsNullOrWhiteSpace(inst.Text)).Select((inst, index) => (inst, index)))
         {
             recipe.Instructions.Add(new Instruction
             {
-                Text = instruction.Text
+                Text = instruction.inst.Text,
+                SortOrder = instruction.inst.SortOrder ?? instruction.index
             });
         }
 
@@ -213,11 +214,13 @@ public class RecipesController : ControllerBase
             Ingredients = orderedRootIngredients.Concat(sectionedIngredients).ToList(),
             IngredientSections = orderedSections,
             Instructions = recipe.Instructions
-                .OrderBy(instruction => instruction.Id)
+                .OrderBy(instruction => instruction.SortOrder)
+                .ThenBy(instruction => instruction.Id)
                 .Select(instruction => new CreateInstructionDto
                 {
                     Id = instruction.Id,
-                    Text = instruction.Text
+                    Text = instruction.Text,
+                    SortOrder = instruction.SortOrder
                 })
                 .ToList(),
             Tags = recipe.Tags

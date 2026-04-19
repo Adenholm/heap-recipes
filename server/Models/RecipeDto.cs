@@ -34,6 +34,7 @@ public class CreateInstructionDto
 {
     public int? Id { get; set; }
     public string Text { get; set; } = "";
+    public int? SortOrder { get; set; }
 }
 
 public class CreateTagDto

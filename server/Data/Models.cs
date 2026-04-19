@@ -60,6 +60,7 @@ public class Instruction
 {
     public int Id { get; set; }
     public string Text { get; set; } = default!;
+    public int SortOrder { get; set; }
 
     public int RecipeId { get; set; }
     public Recipe? Recipe { get; set; }
