@@ -68,7 +68,13 @@ const EditRecipePage = () => {
             ...recipe,
             ingredients: ingredients
                 .filter(ing => ing.name.trim() !== "")
-                .map(ing => ({ id: ing.id, name: ing.name, quantity: ing.quantity })),
+                .map((ing, index) => ({
+                    id: ing.id,
+                    name: ing.name,
+                    quantity: ing.quantity,
+                    sortOrder: ing.sortOrder ?? index,
+                    ingredientSectionId: ing.ingredientSectionId ?? null
+                })),
             instructions: instructions
                 .filter(inst => inst.text.trim() !== "")
                 .map(inst => ({ id: inst.id, text: inst.text })),

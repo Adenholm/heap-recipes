@@ -48,7 +48,15 @@ const AddRecipePage = () => {
     const handleSubmit = () => {
         const newRecipe = {
             ...recipe,
-            ingredients: ingredients.filter(ing => ing.name.trim() !== ""),
+            ingredients: ingredients
+                .filter(ing => ing.name.trim() !== "")
+                .map((ing, index) => ({
+                    id: ing.id,
+                    name: ing.name,
+                    quantity: ing.quantity,
+                    sortOrder: ing.sortOrder ?? index,
+                    ingredientSectionId: ing.ingredientSectionId ?? null
+                })),
             instructions: instructions.filter(inst => inst.text.trim() !== ""),
             tags: tags.map(tag => ({ name: tag.label }))
         };

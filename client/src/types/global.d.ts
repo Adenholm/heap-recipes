@@ -18,6 +18,7 @@ interface Recipe {
 
 interface Ingredient {
     id?: number;
+    clientId?: string;
     name: string;
     quantity: string; // e.g., "2 cups", "1 tbsp"
     sortOrder?: number;
