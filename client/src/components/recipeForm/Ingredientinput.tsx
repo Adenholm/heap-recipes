@@ -44,11 +44,11 @@ const createClientId = () =>
     ? crypto.randomUUID()
     : `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
-const getIngredientId = (ingredient: Ingredient, fallbackIndex = 0) =>
-  ingredient.id != null ? `ingredient-${ingredient.id}` : ingredient.clientId ?? `ingredient-tmp-${fallbackIndex}`;
+const getIngredientId = (ingredient: Ingredient, fallbackKey: string) =>
+  ingredient.id != null ? `ingredient-${ingredient.id}` : ingredient.clientId ?? `ingredient-tmp-${fallbackKey}`;
 
-const getSectionId = (section: IngredientSection, fallbackIndex = 0) =>
-  section.id != null ? `section-${section.id}` : `section-tmp-${fallbackIndex}`;
+const getSectionId = (section: IngredientSection, fallbackKey: string) =>
+  section.id != null ? `section-${section.id}` : section.clientId ?? `section-tmp-${fallbackKey}`;
 
 const sortIngredients = (items: Ingredient[]) =>
   [...items].sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
@@ -80,27 +80,41 @@ const buildRowsFromData = (ingredients: Ingredient[], ingredientSections: Ingred
 
   rootIngredients.forEach((ingredient, index) => {
     rows.push({
-      key: getIngredientId(ingredient, index),
+      key: getIngredientId(ingredient, `root-${index}`),
       kind: "ingredient",
       ingredient,
     });
   });
 
   orderedSections.forEach((section, sectionIndex) => {
+    const sectionWithClientId =
+      section.id == null && !section.clientId
+        ? { ...section, clientId: createClientId() }
+        : section;
+
     rows.push({
-      key: getSectionId(section, sectionIndex),
+      key: getSectionId(sectionWithClientId, `section-${sectionIndex}`),
       kind: "section",
       section: {
-        ...section,
-        ingredients: sortIngredients(section.ingredients),
+        ...sectionWithClientId,
+        ingredients: sortIngredients(sectionWithClientId.ingredients).map((ingredient) =>
+          ingredient.id == null && !ingredient.clientId
+            ? { ...ingredient, clientId: createClientId() }
+            : ingredient
+        ),
       },
     });
 
-    sortIngredients(section.ingredients).forEach((ingredient, ingredientIndex) => {
+    sortIngredients(sectionWithClientId.ingredients).forEach((ingredient, ingredientIndex) => {
+      const ingredientWithClientId =
+        ingredient.id == null && !ingredient.clientId
+          ? { ...ingredient, clientId: createClientId() }
+          : ingredient;
+
       rows.push({
-        key: getIngredientId(ingredient, ingredientIndex),
+        key: getIngredientId(ingredientWithClientId, `section-${sectionIndex}-ingredient-${ingredientIndex}`),
         kind: "ingredient",
-        ingredient,
+        ingredient: ingredientWithClientId,
       });
     });
   });
@@ -283,6 +297,7 @@ const IngredientInput = ({
         key: createClientId(),
         kind: "section",
         section: {
+          clientId: createClientId(),
           name: "Section",
           sortOrder: 0,
           ingredients: [],
