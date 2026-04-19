@@ -30,7 +30,7 @@ const EditRecipePage = () => {
     const [ingredientSections, setIngredientSections] = useState<IngredientSection[]>([]);
 
     const [instructions, setInstructions] = useState<Instruction[]>([
-        { text: "" },
+        { text: "", sortOrder: 0 },
     ]);
 
     const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
@@ -45,7 +45,7 @@ const EditRecipePage = () => {
                     : [{ quantity: "", name: "", sortOrder: 0 }]
             );
             setIngredientSections(data.ingredientSections?.length ? data.ingredientSections : []);
-            setInstructions(data.instructions.length ? data.instructions : [{ text: "" }]);
+            setInstructions(data.instructions.length ? data.instructions : [{ text: "", sortOrder: 0 }]);
             setTags(data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
             setLoading(false);
         };
@@ -97,7 +97,7 @@ const EditRecipePage = () => {
                 })),
             instructions: instructions
                 .filter(inst => inst.text.trim() !== "")
-                .map(inst => ({ id: inst.id, text: inst.text })),
+                .map((inst, index) => ({ id: inst.id, text: inst.text, sortOrder: inst.sortOrder ?? index })),
             tags: tags.map(tag => ({ name: tag.label }))
         };
         console.log(updatedRecipe);

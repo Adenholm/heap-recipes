@@ -27,6 +27,7 @@ interface Ingredient {
 
 interface IngredientSection {
     id?: number;
+    clientId?: string;
     name: string;
     sortOrder?: number;
     ingredients: Ingredient[];
@@ -34,7 +35,9 @@ interface IngredientSection {
 
 interface Instruction {
     id?: number;
+    clientId?: string;
     text: string;
+    sortOrder?: number;
 }
 
 interface Tag {
