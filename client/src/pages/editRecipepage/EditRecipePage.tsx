@@ -4,7 +4,6 @@ import Stepper from "../../components/stepper/Stepper";
 import StepOne from "../../components/recipeForm/steps/StepOne";
 import StepTwo from "../../components/recipeForm/steps/StepTwo";
 import StepThree from "../../components/recipeForm/steps/StepThree";
-import api from "../../service/apiClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecipes } from "../../context/recipes";
 
@@ -28,6 +27,8 @@ const EditRecipePage = () => {
         { quantity: "", name: "", sortOrder: 0 },
     ]);
 
+    const [ingredientSections, setIngredientSections] = useState<IngredientSection[]>([]);
+
     const [instructions, setInstructions] = useState<Instruction[]>([
         { text: "" },
     ]);
@@ -38,7 +39,12 @@ const EditRecipePage = () => {
         const fetchRecipe = async () => {
             const data = await getRecipeById(Number(id));
             setRecipe(data);
-            setIngredients(data.ingredients.length ? data.ingredients : [{ quantity: "", name: "", sortOrder: 0 }]);
+            setIngredients(
+                data.ingredients.filter((ingredient) => ingredient.ingredientSectionId == null).length
+                    ? data.ingredients.filter((ingredient) => ingredient.ingredientSectionId == null)
+                    : [{ quantity: "", name: "", sortOrder: 0 }]
+            );
+            setIngredientSections(data.ingredientSections?.length ? data.ingredientSections : []);
             setInstructions(data.instructions.length ? data.instructions : [{ text: "" }]);
             setTags(data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
             setLoading(false);
@@ -67,13 +73,27 @@ const EditRecipePage = () => {
         const updatedRecipe = {
             ...recipe,
             ingredients: ingredients
-                .filter(ing => ing.name.trim() !== "")
+                .filter((ing) => ing.name.trim() !== "" && ing.ingredientSectionId == null)
                 .map((ing, index) => ({
                     id: ing.id,
                     name: ing.name,
                     quantity: ing.quantity,
-                    sortOrder: ing.sortOrder ?? index,
-                    ingredientSectionId: ing.ingredientSectionId ?? null
+                    sortOrder: ing.sortOrder ?? index
+                })),
+            ingredientSections: ingredientSections
+                .filter((section) => section.name.trim() !== "")
+                .map((section, index) => ({
+                    id: section.id,
+                    name: section.name,
+                    sortOrder: section.sortOrder ?? index,
+                    ingredients: section.ingredients
+                        .filter((ingredient) => ingredient.name.trim() !== "")
+                        .map((ingredient, ingredientIndex) => ({
+                            id: ingredient.id,
+                            name: ingredient.name,
+                            quantity: ingredient.quantity,
+                            sortOrder: ingredient.sortOrder ?? ingredientIndex
+                        })),
                 })),
             instructions: instructions
                 .filter(inst => inst.text.trim() !== "")
@@ -97,7 +117,13 @@ const EditRecipePage = () => {
             <h1>Edit Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />
-                    <StepTwo ingredients={ingredients} setIngredients={setIngredients} />
+                    <StepTwo
+                        ingredients={ingredients}
+                        ingredientSections={ingredientSections}
+                        setIngredients={setIngredients}
+                        setIngredientSections={setIngredientSections}
+                        resetKey={recipe.id ?? "new"}
+                    />
                     <StepThree instructions={instructions} setInstructions={setInstructions} />
             </Stepper>
         </div>

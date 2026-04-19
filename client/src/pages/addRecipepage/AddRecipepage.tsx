@@ -4,7 +4,6 @@ import Stepper from "../../components/stepper/Stepper";
 import StepOne from "../../components/recipeForm/steps/StepOne";
 import StepTwo from "../../components/recipeForm/steps/StepTwo";
 import StepThree from "../../components/recipeForm/steps/StepThree";
-import api from "../../service/apiClient";
 import { useNavigate } from "react-router-dom";
 import { useRecipes } from "../../context/recipes";
 
@@ -25,6 +24,8 @@ const AddRecipePage = () => {
     const [ingredients, setIngredients] = useState<Ingredient[]>([
         { quantity: "", name: "", sortOrder: 0 },
     ]);
+
+    const [ingredientSections, setIngredientSections] = useState<IngredientSection[]>([]);
 
     const [instructions, setInstructions] = useState<Instruction[]>([
         { text: "" },
@@ -49,13 +50,27 @@ const AddRecipePage = () => {
         const newRecipe = {
             ...recipe,
             ingredients: ingredients
-                .filter(ing => ing.name.trim() !== "")
+                .filter((ing) => ing.name.trim() !== "" && ing.ingredientSectionId == null)
                 .map((ing, index) => ({
                     id: ing.id,
                     name: ing.name,
                     quantity: ing.quantity,
                     sortOrder: ing.sortOrder ?? index,
-                    ingredientSectionId: ing.ingredientSectionId ?? null
+                })),
+            ingredientSections: ingredientSections
+                .filter((section) => section.name.trim() !== "")
+                .map((section, index) => ({
+                    id: section.id,
+                    name: section.name,
+                    sortOrder: section.sortOrder ?? index,
+                    ingredients: section.ingredients
+                        .filter((ingredient) => ingredient.name.trim() !== "")
+                        .map((ingredient, ingredientIndex) => ({
+                            id: ingredient.id,
+                            name: ingredient.name,
+                            quantity: ingredient.quantity,
+                            sortOrder: ingredient.sortOrder ?? ingredientIndex,
+                        })),
                 })),
             instructions: instructions.filter(inst => inst.text.trim() !== ""),
             tags: tags.map(tag => ({ name: tag.label }))
@@ -75,7 +90,13 @@ const AddRecipePage = () => {
             <h1>Add Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />
-                    <StepTwo ingredients={ingredients} setIngredients={setIngredients} />
+                    <StepTwo
+                        ingredients={ingredients}
+                        ingredientSections={ingredientSections}
+                        setIngredients={setIngredients}
+                        setIngredientSections={setIngredientSections}
+                        resetKey={recipe.id ?? "new"}
+                    />
                     <StepThree instructions={instructions} setInstructions={setInstructions} />
             </Stepper>
         </div>

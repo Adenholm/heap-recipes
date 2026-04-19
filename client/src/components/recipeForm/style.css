@@ -29,6 +29,19 @@
   margin-bottom: 0;
 }
 
+.ingredient-row--nested {
+  margin-left: 1.5rem;
+}
+
+.ingredient-section-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 1rem 0 0.35rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(95, 107, 82, 0.22);
+}
+
 .drag-handle {
   border: none;
   background: transparent;
@@ -69,6 +82,17 @@
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.add-btn--secondary {
+  background-color: #6f7f55;
+}
+
+.ingredient-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
 }
 
 .recipe-form input {
