@@ -37,8 +37,6 @@ const RecipePage = () => {
             const existingRecipe = await getRecipeById(Number(id));
             if (existingRecipe) {
                 existingRecipe.instructions.sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
-                existingRecipe.ingredients = [...existingRecipe.ingredients]
-                    .sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
                 setRecipe(existingRecipe);
                 setPortions(existingRecipe.servings);
                 return;
@@ -60,21 +58,18 @@ const RecipePage = () => {
         openModal();
     };
 
-    const rootIngredients = recipe.ingredients
-        .filter((ingredient) => ingredient.ingredientSectionId == null)
-        .sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
-
-    const orderedSections = [...(recipe.ingredientSections ?? [])].sort(
+    const sortedSections = [...(recipe.ingredientSections ?? [])].sort(
         (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
     );
+    const uncategorizedSection = sortedSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+    const rootIngredients = (uncategorizedSection?.ingredients ?? recipe.ingredients ?? []).slice().sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const orderedSections = sortedSections.filter((section) => !section.isUncategorized && section.id != null);
 
     const handlePortionsChange = (newPortions: number) => {
         setRecipe(prevRecipe => {
             if (!prevRecipe) return null;
-            const updatedIngredients = prevRecipe.ingredients.map(ingredient => ({
-                ...ingredient,
-                quantity: scaleQuantity(ingredient.quantity, newPortions / portions)
-            }));
             const updatedIngredientSections = (prevRecipe.ingredientSections ?? []).map((section) => ({
                 ...section,
                 ingredients: section.ingredients.map((ingredient) => ({
@@ -83,7 +78,7 @@ const RecipePage = () => {
                 })),
             }));
             setPortions(newPortions);
-            return { ...prevRecipe, ingredients: updatedIngredients, ingredientSections: updatedIngredientSections };
+            return { ...prevRecipe, ingredientSections: updatedIngredientSections };
         });
     };
 

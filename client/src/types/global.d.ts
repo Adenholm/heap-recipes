@@ -8,7 +8,7 @@ interface Recipe {
     title: string;
     description: string;
     imageUrl: string;
-    ingredients: Ingredient[];
+    ingredients?: Ingredient[];
     ingredientSections?: IngredientSection[];
     instructions: Instruction[];
     prepTime: number; // in minutes
@@ -26,8 +26,9 @@ interface Ingredient {
 }
 
 interface IngredientSection {
-    id?: number;
+    id?: number | null;
     clientId?: string;
+    isUncategorized?: boolean;
     name: string;
     sortOrder?: number;
     ingredients: Ingredient[];

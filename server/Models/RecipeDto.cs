@@ -51,7 +51,6 @@ public class RecipeReadDto
     public string? ImageUrl { get; set; }
     public int? PrepTime { get; set; }
     public int? Servings { get; set; }
-    public List<IngredientReadDto> Ingredients { get; set; } = new();
     public List<IngredientSectionReadDto> IngredientSections { get; set; } = new();
     public List<CreateInstructionDto> Instructions { get; set; } = new();
     public List<CreateTagDto> Tags { get; set; } = new();
@@ -68,8 +67,9 @@ public class IngredientReadDto
 
 public class IngredientSectionReadDto
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public string Name { get; set; } = default!;
     public int SortOrder { get; set; }
+    public bool IsUncategorized { get; set; }
     public List<IngredientReadDto> Ingredients { get; set; } = new();
 }

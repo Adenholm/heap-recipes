@@ -7,6 +7,21 @@ import StepThree from "../../components/recipeForm/steps/StepThree";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecipes } from "../../context/recipes";
 
+const splitIngredientSections = (sections?: IngredientSection[]) => {
+    const sortedSections = [...(sections ?? [])].sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const uncategorizedSection = sortedSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+
+    return {
+        ingredients: uncategorizedSection?.ingredients ?? [],
+        ingredientSections: sortedSections.filter((section) => !section.isUncategorized && section.id != null),
+    };
+};
+
+const getLegacyRootIngredients = (recipe: Recipe) =>
+    recipe.ingredients?.filter((ingredient) => ingredient.ingredientSectionId == null) ?? [];
+
 const EditRecipePage = () => {
     const { getRecipeById, editRecipe} = useRecipes();
     const { id } = useParams<{ id: string }>();
@@ -39,12 +54,16 @@ const EditRecipePage = () => {
         const fetchRecipe = async () => {
             const data = await getRecipeById(Number(id));
             setRecipe(data);
+            const sectionState = splitIngredientSections(data.ingredientSections);
+            const legacyRootIngredients = getLegacyRootIngredients(data);
             setIngredients(
-                data.ingredients.filter((ingredient) => ingredient.ingredientSectionId == null).length
-                    ? data.ingredients.filter((ingredient) => ingredient.ingredientSectionId == null)
-                    : [{ quantity: "", name: "", sortOrder: 0 }]
+                sectionState.ingredients.length
+                    ? sectionState.ingredients
+                    : legacyRootIngredients.length
+                        ? legacyRootIngredients
+                        : [{ quantity: "", name: "", sortOrder: 0 }]
             );
-            setIngredientSections(data.ingredientSections?.length ? data.ingredientSections : []);
+            setIngredientSections(sectionState.ingredientSections);
             setInstructions(data.instructions.length ? data.instructions : [{ text: "", sortOrder: 0 }]);
             setTags(data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
             setLoading(false);

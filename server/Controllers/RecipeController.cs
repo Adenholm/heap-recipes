@@ -178,6 +178,7 @@ public class RecipesController : ControllerBase
     private static RecipeReadDto ToReadDto(Recipe recipe)
     {
         var orderedRootIngredients = recipe.Ingredients
+            .Where(ingredient => ingredient.IngredientSectionId == null)
             .OrderBy(ingredient => ingredient.SortOrder)
             .ThenBy(ingredient => ingredient.Id)
             .Select(ingredient => ToReadDto(ingredient, null))
@@ -191,6 +192,7 @@ public class RecipesController : ControllerBase
                 Id = section.Id,
                 Name = section.Name,
                 SortOrder = section.SortOrder,
+                IsUncategorized = false,
                 Ingredients = section.Ingredients
                     .OrderBy(ingredient => ingredient.SortOrder)
                     .ThenBy(ingredient => ingredient.Id)
@@ -199,9 +201,17 @@ public class RecipesController : ControllerBase
             })
             .ToList();
 
-        var sectionedIngredients = orderedSections
-            .SelectMany(section => section.Ingredients)
-            .ToList();
+        if (orderedRootIngredients.Any())
+        {
+            orderedSections.Insert(0, new IngredientSectionReadDto
+            {
+                Id = null,
+                Name = "Uncategorized",
+                SortOrder = -1,
+                IsUncategorized = true,
+                Ingredients = orderedRootIngredients
+            });
+        }
 
         return new RecipeReadDto
         {
@@ -211,7 +221,6 @@ public class RecipesController : ControllerBase
             ImageUrl = recipe.ImageUrl,
             PrepTime = recipe.PrepTime,
             Servings = recipe.Servings,
-            Ingredients = orderedRootIngredients.Concat(sectionedIngredients).ToList(),
             IngredientSections = orderedSections,
             Instructions = recipe.Instructions
                 .OrderBy(instruction => instruction.SortOrder)
