@@ -20,7 +20,7 @@ const IngredientInput = ({ ingredients, setIngredients }: IngredientInputProps) 
   };
 
   const addIngredient = () => {
-    setIngredients((prev) => [...prev, { quantity: "", name: "" }]);
+    setIngredients((prev) => [...prev, { quantity: "", name: "", sortOrder: prev.length }]);
   };
 
   const removeIngredient = (index: number) => {
@@ -30,7 +30,9 @@ const IngredientInput = ({ ingredients, setIngredients }: IngredientInputProps) 
   return (
     <div>
       <h3>Ingredients</h3>
-      {ingredients.sort((a, b) => (a.id ?? 0) - (b.id ?? 0)).map((ingredient, index) => (
+      {[...ingredients]
+        .sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0))
+        .map((ingredient, index) => (
         <div key={index} className="ingredient-row">
           <input
             type="text"

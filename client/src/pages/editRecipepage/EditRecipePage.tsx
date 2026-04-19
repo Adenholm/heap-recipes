@@ -25,7 +25,7 @@ const EditRecipePage = () => {
     });
 
     const [ingredients, setIngredients] = useState<Ingredient[]>([
-        { quantity: "", name: "" },
+        { quantity: "", name: "", sortOrder: 0 },
     ]);
 
     const [instructions, setInstructions] = useState<Instruction[]>([
@@ -38,7 +38,7 @@ const EditRecipePage = () => {
         const fetchRecipe = async () => {
             const data = await getRecipeById(Number(id));
             setRecipe(data);
-            setIngredients(data.ingredients.length ? data.ingredients : [{ quantity: "", name: "" }]);
+            setIngredients(data.ingredients.length ? data.ingredients : [{ quantity: "", name: "", sortOrder: 0 }]);
             setInstructions(data.instructions.length ? data.instructions : [{ text: "" }]);
             setTags(data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
             setLoading(false);

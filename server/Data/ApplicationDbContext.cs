@@ -9,6 +9,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<Ingredient> Ingredients => Set<Ingredient>();
+    public DbSet<IngredientSection> IngredientSections => Set<IngredientSection>();
     public DbSet<Instruction> Instructions => Set<Instruction>();
     public DbSet<Tag> Tags => Set<Tag>();
 
@@ -20,6 +21,18 @@ public class ApplicationDbContext : DbContext
             .HasMany(r => r.Ingredients)
             .WithOne(i => i.Recipe)
             .HasForeignKey(i => i.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Recipe>()
+            .HasMany(r => r.IngredientSections)
+            .WithOne(s => s.Recipe)
+            .HasForeignKey(s => s.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<IngredientSection>()
+            .HasMany(s => s.Ingredients)
+            .WithOne(i => i.IngredientSection)
+            .HasForeignKey(i => i.IngredientSectionId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Recipe>()

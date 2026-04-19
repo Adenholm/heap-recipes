@@ -14,30 +14,36 @@ public class RecipesController : ControllerBase
     public RecipesController(ApplicationDbContext db) => _db = db;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Recipe>>> GetAll()
+    public async Task<ActionResult<IEnumerable<RecipeReadDto>>> GetAll()
     {
-        return await _db.Recipes
+        var recipes = await _db.Recipes
             .Include(r => r.Tags)
             .Include(r => r.Ingredients)
+            .Include(r => r.IngredientSections)
+                .ThenInclude(s => s.Ingredients)
             .Include(r => r.Instructions)
             .ToListAsync();
+
+        return recipes.Select(ToReadDto).ToList();
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Recipe>> GetById(int id)
+    public async Task<ActionResult<RecipeReadDto>> GetById(int id)
     {
         var recipe = await _db.Recipes
             .Include(r => r.Tags)
             .Include(r => r.Ingredients)
+            .Include(r => r.IngredientSections)
+                .ThenInclude(s => s.Ingredients)
             .Include(r => r.Instructions)
             .FirstOrDefaultAsync(r => r.Id == id);
 
-        return recipe is null ? NotFound() : recipe;
+        return recipe is null ? NotFound() : ToReadDto(recipe);
     }
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<Recipe>> CreateRecipe([FromBody] CreateRecipeDto dto)
+    public async Task<ActionResult<RecipeReadDto>> CreateRecipe([FromBody] CreateRecipeDto dto)
     {
         var recipe = new Recipe
         {
@@ -48,46 +54,11 @@ public class RecipesController : ControllerBase
             Servings = dto.Servings,
         };
 
-        // Handle ingredients
-        recipe.Ingredients = dto.Ingredients
-            .Where(ing => !string.IsNullOrWhiteSpace(ing.Name))
-            .Select(ingDto => new Ingredient
-            {
-                Name = ingDto.Name,
-                Quantity = ingDto.Quantity
-            }).ToList();
-
-        // Handle instructions
-        recipe.Instructions = dto.Instructions
-            .Where(inst => !string.IsNullOrWhiteSpace(inst.Text))
-            .Select(instDto => new Instruction
-            {
-                Text = instDto.Text
-            }).ToList();
-
-        // Handle tags
-        foreach (var tagDto in dto.Tags)
-        {
-            if (string.IsNullOrWhiteSpace(tagDto.Name))
-                continue;
-
-            var existingTag = await _db.Tags
-                .FirstOrDefaultAsync(t => t.Name.ToLower() == tagDto.Name.ToLower());
-
-            if (existingTag != null)
-            {
-                recipe.Tags.Add(existingTag);
-            }
-            else
-            {
-                var newTag = new Tag { Name = tagDto.Name };
-                recipe.Tags.Add(newTag);
-            }
-        }
+        ApplyRecipeDetails(recipe, dto);
 
         _db.Recipes.Add(recipe);
         await _db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = recipe.Id }, recipe);
+        return CreatedAtAction(nameof(GetById), new { id = recipe.Id }, ToReadDto(recipe));
     }
 
     [Authorize]
@@ -96,6 +67,8 @@ public class RecipesController : ControllerBase
     {
         var recipe = await _db.Recipes
             .Include(r => r.Ingredients)
+            .Include(r => r.IngredientSections)
+                .ThenInclude(s => s.Ingredients)
             .Include(r => r.Instructions)
             .Include(r => r.Tags)
             .FirstOrDefaultAsync(r => r.Id == id);
@@ -109,86 +82,7 @@ public class RecipesController : ControllerBase
         recipe.PrepTime = dto.PrepTime;
         recipe.Servings = dto.Servings;
 
-        // --- INGREDIENTS ---
-        var dtoIngredientIds = dto.Ingredients
-            .Where(i => i.Id.HasValue)
-            .Select(i => i.Id.Value)
-            .ToHashSet();
-
-        var ingredientsToRemove = recipe.Ingredients
-            .Where(i => !dtoIngredientIds.Contains(i.Id))
-            .ToList();
-        foreach (var ing in ingredientsToRemove)
-        {
-            recipe.Ingredients.Remove(ing);
-        }
-
-        foreach (var ingDto in dto.Ingredients)
-        {
-            var existingIng = recipe.Ingredients.FirstOrDefault(i => i.Id == ingDto.Id);
-
-            if (existingIng != null)
-            {
-                existingIng.Name = ingDto.Name;
-                existingIng.Quantity = ingDto.Quantity;
-            }
-            else
-            {
-                recipe.Ingredients.Add(new Ingredient
-                {
-                    Name = ingDto.Name,
-                    Quantity = ingDto.Quantity,
-                    RecipeId = recipe.Id
-                });
-            }
-        }
-
-        // --- INSTRUCTIONS ---
-        var dtoInstructionIds = dto.Instructions
-            .Where(i => i.Id.HasValue)
-            .Select(i => i.Id.Value)
-            .ToHashSet();
-
-        var instructionsToRemove = recipe.Instructions
-            .Where(i => !dtoInstructionIds.Contains(i.Id))
-            .ToList();
-        foreach (var inst in instructionsToRemove)
-        {
-            recipe.Instructions.Remove(inst);
-        } 
-        foreach (var instDto in dto.Instructions)
-        {
-            var existingInst = recipe.Instructions.FirstOrDefault(i => i.Id == instDto.Id);
-
-            if (existingInst != null)
-            {
-                existingInst.Text = instDto.Text;
-            }
-            else
-            {
-                recipe.Instructions.Add(new Instruction
-                {
-                    Text = instDto.Text,
-                    RecipeId = recipe.Id
-                });
-            }
-        }
-
-        // --- TAGS ---
-        recipe.Tags.Clear();
-        foreach (var tagDto in dto.Tags)
-        {
-            if (string.IsNullOrWhiteSpace(tagDto.Name))
-                continue;
-
-            var tag = await _db.Tags.FirstOrDefaultAsync(t =>
-                t.Name.ToLower() == tagDto.Name.ToLower());
-
-            if (tag == null)
-                tag = new Tag { Name = tagDto.Name };
-
-            recipe.Tags.Add(tag);
-        }
+        ApplyRecipeDetails(recipe, dto);
 
         await _db.SaveChangesAsync();
         return NoContent();
@@ -205,5 +99,147 @@ public class RecipesController : ControllerBase
         _db.Recipes.Remove(recipe);
         await _db.SaveChangesAsync();
         return Ok();
+    }
+
+    private void ApplyRecipeDetails(Recipe recipe, CreateRecipeDto dto)
+    {
+        recipe.Ingredients.Clear();
+        recipe.IngredientSections.Clear();
+        recipe.Instructions.Clear();
+        recipe.Tags.Clear();
+
+        foreach (var ingredient in BuildIngredients(recipe, null, dto.Ingredients))
+        {
+            recipe.Ingredients.Add(ingredient);
+        }
+
+        foreach (var section in BuildIngredientSections(recipe, dto.IngredientSections))
+        {
+            recipe.IngredientSections.Add(section);
+        }
+
+        foreach (var instruction in dto.Instructions.Where(inst => !string.IsNullOrWhiteSpace(inst.Text)))
+        {
+            recipe.Instructions.Add(new Instruction
+            {
+                Text = instruction.Text
+            });
+        }
+
+        foreach (var tagDto in dto.Tags)
+        {
+            if (string.IsNullOrWhiteSpace(tagDto.Name))
+                continue;
+
+            var tag = _db.Tags.Local.FirstOrDefault(t =>
+                t.Name.Equals(tagDto.Name, StringComparison.OrdinalIgnoreCase))
+                ?? _db.Tags.FirstOrDefault(t => t.Name.ToLower() == tagDto.Name.ToLower());
+
+            if (tag == null)
+                tag = new Tag { Name = tagDto.Name };
+
+            recipe.Tags.Add(tag);
+        }
+    }
+
+    private IEnumerable<IngredientSection> BuildIngredientSections(Recipe recipe, IEnumerable<CreateIngredientSectionDto> sectionDtos)
+    {
+        return sectionDtos
+            .Where(section => !string.IsNullOrWhiteSpace(section.Name))
+            .Select((section, sectionIndex) =>
+            {
+                var sectionEntity = new IngredientSection
+                {
+                    Name = section.Name,
+                    SortOrder = section.SortOrder ?? sectionIndex,
+                    Recipe = recipe
+                };
+
+                sectionEntity.Ingredients = BuildIngredients(recipe, sectionEntity, section.Ingredients).ToList();
+                return sectionEntity;
+            });
+    }
+
+    private IEnumerable<Ingredient> BuildIngredients(Recipe recipe, IngredientSection? section, IEnumerable<CreateIngredientDto> ingredientDtos)
+    {
+        return ingredientDtos
+            .Where(ingredient => !string.IsNullOrWhiteSpace(ingredient.Name))
+            .Select((ingredient, index) => new Ingredient
+            {
+                Name = ingredient.Name,
+                Quantity = ingredient.Quantity,
+                SortOrder = ingredient.SortOrder ?? index,
+                Recipe = recipe,
+                IngredientSection = section
+            });
+    }
+
+    private static RecipeReadDto ToReadDto(Recipe recipe)
+    {
+        var orderedRootIngredients = recipe.Ingredients
+            .OrderBy(ingredient => ingredient.SortOrder)
+            .ThenBy(ingredient => ingredient.Id)
+            .Select(ingredient => ToReadDto(ingredient, null))
+            .ToList();
+
+        var orderedSections = recipe.IngredientSections
+            .OrderBy(section => section.SortOrder)
+            .ThenBy(section => section.Id)
+            .Select(section => new IngredientSectionReadDto
+            {
+                Id = section.Id,
+                Name = section.Name,
+                SortOrder = section.SortOrder,
+                Ingredients = section.Ingredients
+                    .OrderBy(ingredient => ingredient.SortOrder)
+                    .ThenBy(ingredient => ingredient.Id)
+                    .Select(ingredient => ToReadDto(ingredient, section.Id))
+                    .ToList()
+            })
+            .ToList();
+
+        var sectionedIngredients = orderedSections
+            .SelectMany(section => section.Ingredients)
+            .ToList();
+
+        return new RecipeReadDto
+        {
+            Id = recipe.Id,
+            Title = recipe.Title,
+            Description = recipe.Description,
+            ImageUrl = recipe.ImageUrl,
+            PrepTime = recipe.PrepTime,
+            Servings = recipe.Servings,
+            Ingredients = orderedRootIngredients.Concat(sectionedIngredients).ToList(),
+            IngredientSections = orderedSections,
+            Instructions = recipe.Instructions
+                .OrderBy(instruction => instruction.Id)
+                .Select(instruction => new CreateInstructionDto
+                {
+                    Id = instruction.Id,
+                    Text = instruction.Text
+                })
+                .ToList(),
+            Tags = recipe.Tags
+                .OrderBy(tag => tag.Name)
+                .Select(tag => new CreateTagDto
+                {
+                    Id = tag.Id,
+                    Name = tag.Name
+                })
+                .ToList()
+        };
+    }
+
+    private static IngredientReadDto ToReadDto(Ingredient ingredient, int? ingredientSectionId)
+    {
+        return new IngredientReadDto
+        {
+            Id = ingredient.Id,
+            Name = ingredient.Name,
+            Quantity = ingredient.Quantity,
+            SortOrder = ingredient.SortOrder,
+            IngredientSectionId = ingredientSectionId
+        };
     }
 }

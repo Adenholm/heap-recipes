@@ -36,14 +36,47 @@ namespace HeapReacipesApi.Migrations
                     b.Property<string>("Quantity")
                         .HasColumnType("text");
 
+                    b.Property<int?>("IngredientSectionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
                     b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IngredientSectionId");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("Ingredients");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.IngredientSection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("IngredientSections");
                 });
 
             modelBuilder.Entity("HeapRecipeApi.Data.Instruction", b =>
@@ -155,11 +188,29 @@ namespace HeapReacipesApi.Migrations
 
             modelBuilder.Entity("HeapRecipeApi.Data.Ingredient", b =>
                 {
+                    b.HasOne("HeapRecipeApi.Data.IngredientSection", "IngredientSection")
+                        .WithMany("Ingredients")
+                        .HasForeignKey("IngredientSectionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
                         .WithMany("Ingredients")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.IngredientSection", b =>
+                {
+                    b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
+                        .WithMany("IngredientSections")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredients");
 
                     b.Navigation("Recipe");
                 });
@@ -193,6 +244,8 @@ namespace HeapReacipesApi.Migrations
             modelBuilder.Entity("HeapRecipeApi.Data.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
+
+                    b.Navigation("IngredientSections");
 
                     b.Navigation("Instructions");
                 });

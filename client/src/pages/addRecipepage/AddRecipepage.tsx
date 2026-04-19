@@ -23,7 +23,7 @@ const AddRecipePage = () => {
     });
 
     const [ingredients, setIngredients] = useState<Ingredient[]>([
-        { quantity: "", name: "" },
+        { quantity: "", name: "", sortOrder: 0 },
     ]);
 
     const [instructions, setInstructions] = useState<Instruction[]>([

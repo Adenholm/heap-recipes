@@ -37,7 +37,8 @@ const RecipePage = () => {
             const existingRecipe = await getRecipeById(Number(id));
             if (existingRecipe) {
                 existingRecipe.instructions.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-                existingRecipe.ingredients.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+                existingRecipe.ingredients = [...existingRecipe.ingredients]
+                    .sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
                 setRecipe(existingRecipe);
                 setPortions(existingRecipe.servings);
                 return;

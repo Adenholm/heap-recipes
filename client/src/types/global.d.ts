@@ -9,6 +9,7 @@ interface Recipe {
     description: string;
     imageUrl: string;
     ingredients: Ingredient[];
+    ingredientSections?: IngredientSection[];
     instructions: Instruction[];
     prepTime: number; // in minutes
     servings: number;
@@ -19,6 +20,15 @@ interface Ingredient {
     id?: number;
     name: string;
     quantity: string; // e.g., "2 cups", "1 tbsp"
+    sortOrder?: number;
+    ingredientSectionId?: number | null;
+}
+
+interface IngredientSection {
+    id?: number;
+    name: string;
+    sortOrder?: number;
+    ingredients: Ingredient[];
 }
 
 interface Instruction {
