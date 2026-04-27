@@ -92,3 +92,5 @@ server/appsettings.Development.json
 server/obj/*
 server/bin/*
 .fake
+
+docker-compose.override.yml
