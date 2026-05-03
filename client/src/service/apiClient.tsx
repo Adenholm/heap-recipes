@@ -23,7 +23,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Optionally redirect to login or clear token
       console.warn('Unauthorized, redirect to login');
-      localStorage.removeItem('token');      
+      localStorage.removeItem('token');
     }
     return Promise.reject(error);
   }
