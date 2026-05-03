@@ -25,8 +25,22 @@ public class Recipe
     public ICollection<IngredientSection> IngredientSections { get; set; } = new List<IngredientSection>();
 
     public ICollection<Instruction> Instructions { get; set; } = new List<Instruction>();
+
+    public ICollection<InstructionSection> InstructionSections { get; set; } = new List<InstructionSection>();
     
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+}
+
+public class InstructionSection
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+    public int SortOrder { get; set; }
+
+    public int RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
+
+    public ICollection<Instruction> Instructions { get; set; } = new List<Instruction>();
 }
 
 public class IngredientSection
@@ -64,6 +78,9 @@ public class Instruction
 
     public int RecipeId { get; set; }
     public Recipe? Recipe { get; set; }
+
+    public int? InstructionSectionId { get; set; }
+    public InstructionSection? InstructionSection { get; set; }
 }
 
 public class Tag

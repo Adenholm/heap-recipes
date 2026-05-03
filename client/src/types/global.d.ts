@@ -10,7 +10,8 @@ interface Recipe {
     imageUrl: string;
     ingredients?: Ingredient[];
     ingredientSections?: IngredientSection[];
-    instructions: Instruction[];
+    instructions?: Instruction[];
+    instructionSections?: InstructionSection[];
     prepTime: number; // in minutes
     servings: number;
     tags: Tag[];
@@ -39,6 +40,16 @@ interface Instruction {
     clientId?: string;
     text: string;
     sortOrder?: number;
+    instructionSectionId?: number | null;
+}
+
+interface InstructionSection {
+    id?: number | null;
+    clientId?: string;
+    isUncategorized?: boolean;
+    name: string;
+    sortOrder?: number;
+    instructions: Instruction[];
 }
 
 interface Tag {

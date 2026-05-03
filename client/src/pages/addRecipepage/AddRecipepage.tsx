@@ -31,6 +31,8 @@ const AddRecipePage = () => {
         { text: "", sortOrder: 0 },
     ]);
 
+    const [instructionSections, setInstructionSections] = useState<InstructionSection[]>([]);
+
     const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -73,11 +75,25 @@ const AddRecipePage = () => {
                         })),
                 })),
             instructions: instructions
-                .filter(inst => inst.text.trim() !== "")
+                .filter((inst) => inst.text.trim() !== "" && inst.instructionSectionId == null)
                 .map((inst, index) => ({
                     id: inst.id,
                     text: inst.text,
                     sortOrder: inst.sortOrder ?? index,
+                })),
+            instructionSections: instructionSections
+                .filter((section) => section.name.trim() !== "")
+                .map((section, index) => ({
+                    id: section.id,
+                    name: section.name,
+                    sortOrder: section.sortOrder ?? index,
+                    instructions: section.instructions
+                        .filter((instruction) => instruction.text.trim() !== "")
+                        .map((instruction, instructionIndex) => ({
+                            id: instruction.id,
+                            text: instruction.text,
+                            sortOrder: instruction.sortOrder ?? instructionIndex,
+                        })),
                 })),
             tags: tags.map(tag => ({ name: tag.label }))
         };
@@ -103,7 +119,13 @@ const AddRecipePage = () => {
                         setIngredientSections={setIngredientSections}
                         resetKey={recipe.id ?? "new"}
                     />
-                    <StepThree instructions={instructions} setInstructions={setInstructions} />
+                    <StepThree
+                        instructions={instructions}
+                        instructionSections={instructionSections}
+                        setInstructions={setInstructions}
+                        setInstructionSections={setInstructionSections}
+                        resetKey={recipe.id ?? "new"}
+                    />
             </Stepper>
         </div>
     );

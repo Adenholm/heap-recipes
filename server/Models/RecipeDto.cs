@@ -11,6 +11,7 @@ public class CreateRecipeDto
     public List<CreateIngredientDto> Ingredients { get; set; } = new();
     public List<CreateIngredientSectionDto> IngredientSections { get; set; } = new();
     public List<CreateInstructionDto> Instructions { get; set; } = new();
+    public List<CreateInstructionSectionDto> InstructionSections { get; set; } = new();
     public List<CreateTagDto> Tags { get; set; } = new();
 }
 
@@ -35,6 +36,15 @@ public class CreateInstructionDto
     public int? Id { get; set; }
     public string Text { get; set; } = "";
     public int? SortOrder { get; set; }
+    public int? InstructionSectionId { get; set; }
+}
+
+public class CreateInstructionSectionDto
+{
+    public int? Id { get; set; }
+    public string Name { get; set; } = "";
+    public int? SortOrder { get; set; }
+    public List<CreateInstructionDto> Instructions { get; set; } = new();
 }
 
 public class CreateTagDto
@@ -52,7 +62,7 @@ public class RecipeReadDto
     public int? PrepTime { get; set; }
     public int? Servings { get; set; }
     public List<IngredientSectionReadDto> IngredientSections { get; set; } = new();
-    public List<CreateInstructionDto> Instructions { get; set; } = new();
+    public List<InstructionSectionReadDto> InstructionSections { get; set; } = new();
     public List<CreateTagDto> Tags { get; set; } = new();
 }
 
@@ -72,4 +82,21 @@ public class IngredientSectionReadDto
     public int SortOrder { get; set; }
     public bool IsUncategorized { get; set; }
     public List<IngredientReadDto> Ingredients { get; set; } = new();
+}
+
+public class InstructionReadDto
+{
+    public int Id { get; set; }
+    public string Text { get; set; } = default!;
+    public int SortOrder { get; set; }
+    public int? InstructionSectionId { get; set; }
+}
+
+public class InstructionSectionReadDto
+{
+    public int? Id { get; set; }
+    public string Name { get; set; } = default!;
+    public int SortOrder { get; set; }
+    public bool IsUncategorized { get; set; }
+    public List<InstructionReadDto> Instructions { get; set; } = new();
 }

@@ -22,6 +22,8 @@ public class RecipesController : ControllerBase
             .Include(r => r.IngredientSections)
                 .ThenInclude(s => s.Ingredients)
             .Include(r => r.Instructions)
+            .Include(r => r.InstructionSections)
+                .ThenInclude(s => s.Instructions)
             .ToListAsync();
 
         return recipes.Select(ToReadDto).ToList();
@@ -36,6 +38,8 @@ public class RecipesController : ControllerBase
             .Include(r => r.IngredientSections)
                 .ThenInclude(s => s.Ingredients)
             .Include(r => r.Instructions)
+            .Include(r => r.InstructionSections)
+                .ThenInclude(s => s.Instructions)
             .FirstOrDefaultAsync(r => r.Id == id);
 
         return recipe is null ? NotFound() : ToReadDto(recipe);
@@ -70,6 +74,8 @@ public class RecipesController : ControllerBase
             .Include(r => r.IngredientSections)
                 .ThenInclude(s => s.Ingredients)
             .Include(r => r.Instructions)
+            .Include(r => r.InstructionSections)
+                .ThenInclude(s => s.Instructions)
             .Include(r => r.Tags)
             .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -106,6 +112,7 @@ public class RecipesController : ControllerBase
         recipe.Ingredients.Clear();
         recipe.IngredientSections.Clear();
         recipe.Instructions.Clear();
+        recipe.InstructionSections.Clear();
         recipe.Tags.Clear();
 
         foreach (var ingredient in BuildIngredients(recipe, null, dto.Ingredients))
@@ -118,13 +125,14 @@ public class RecipesController : ControllerBase
             recipe.IngredientSections.Add(section);
         }
 
-        foreach (var instruction in dto.Instructions.Where(inst => !string.IsNullOrWhiteSpace(inst.Text)).Select((inst, index) => (inst, index)))
+        foreach (var instruction in BuildInstructions(recipe, null, dto.Instructions))
         {
-            recipe.Instructions.Add(new Instruction
-            {
-                Text = instruction.inst.Text,
-                SortOrder = instruction.inst.SortOrder ?? instruction.index
-            });
+            recipe.Instructions.Add(instruction);
+        }
+
+        foreach (var section in BuildInstructionSections(recipe, dto.InstructionSections))
+        {
+            recipe.InstructionSections.Add(section);
         }
 
         foreach (var tagDto in dto.Tags)
@@ -175,6 +183,37 @@ public class RecipesController : ControllerBase
             });
     }
 
+    private IEnumerable<InstructionSection> BuildInstructionSections(Recipe recipe, IEnumerable<CreateInstructionSectionDto> sectionDtos)
+    {
+        return sectionDtos
+            .Where(section => !string.IsNullOrWhiteSpace(section.Name))
+            .Select((section, sectionIndex) =>
+            {
+                var sectionEntity = new InstructionSection
+                {
+                    Name = section.Name,
+                    SortOrder = section.SortOrder ?? sectionIndex,
+                    Recipe = recipe
+                };
+
+                sectionEntity.Instructions = BuildInstructions(recipe, sectionEntity, section.Instructions).ToList();
+                return sectionEntity;
+            });
+    }
+
+    private IEnumerable<Instruction> BuildInstructions(Recipe recipe, InstructionSection? section, IEnumerable<CreateInstructionDto> instructionDtos)
+    {
+        return instructionDtos
+            .Where(instruction => !string.IsNullOrWhiteSpace(instruction.Text))
+            .Select((instruction, index) => new Instruction
+            {
+                Text = instruction.Text,
+                SortOrder = instruction.SortOrder ?? index,
+                Recipe = recipe,
+                InstructionSection = section
+            });
+    }
+
     private static RecipeReadDto ToReadDto(Recipe recipe)
     {
         var orderedRootIngredients = recipe.Ingredients
@@ -201,6 +240,30 @@ public class RecipesController : ControllerBase
             })
             .ToList();
 
+        var orderedRootInstructions = recipe.Instructions
+            .Where(instruction => instruction.InstructionSectionId == null)
+            .OrderBy(instruction => instruction.SortOrder)
+            .ThenBy(instruction => instruction.Id)
+            .Select(instruction => ToReadDto(instruction, null))
+            .ToList();
+
+        var orderedInstructionSections = recipe.InstructionSections
+            .OrderBy(section => section.SortOrder)
+            .ThenBy(section => section.Id)
+            .Select(section => new InstructionSectionReadDto
+            {
+                Id = section.Id,
+                Name = section.Name,
+                SortOrder = section.SortOrder,
+                IsUncategorized = false,
+                Instructions = section.Instructions
+                    .OrderBy(instruction => instruction.SortOrder)
+                    .ThenBy(instruction => instruction.Id)
+                    .Select(instruction => ToReadDto(instruction, section.Id))
+                    .ToList()
+            })
+            .ToList();
+
         if (orderedRootIngredients.Any())
         {
             orderedSections.Insert(0, new IngredientSectionReadDto
@@ -213,6 +276,18 @@ public class RecipesController : ControllerBase
             });
         }
 
+        if (orderedRootInstructions.Any())
+        {
+            orderedInstructionSections.Insert(0, new InstructionSectionReadDto
+            {
+                Id = null,
+                Name = "Uncategorized",
+                SortOrder = -1,
+                IsUncategorized = true,
+                Instructions = orderedRootInstructions
+            });
+        }
+
         return new RecipeReadDto
         {
             Id = recipe.Id,
@@ -222,16 +297,7 @@ public class RecipesController : ControllerBase
             PrepTime = recipe.PrepTime,
             Servings = recipe.Servings,
             IngredientSections = orderedSections,
-            Instructions = recipe.Instructions
-                .OrderBy(instruction => instruction.SortOrder)
-                .ThenBy(instruction => instruction.Id)
-                .Select(instruction => new CreateInstructionDto
-                {
-                    Id = instruction.Id,
-                    Text = instruction.Text,
-                    SortOrder = instruction.SortOrder
-                })
-                .ToList(),
+            InstructionSections = orderedInstructionSections,
             Tags = recipe.Tags
                 .OrderBy(tag => tag.Name)
                 .Select(tag => new CreateTagDto
@@ -252,6 +318,17 @@ public class RecipesController : ControllerBase
             Quantity = ingredient.Quantity,
             SortOrder = ingredient.SortOrder,
             IngredientSectionId = ingredientSectionId
+        };
+    }
+
+    private static InstructionReadDto ToReadDto(Instruction instruction, int? instructionSectionId)
+    {
+        return new InstructionReadDto
+        {
+            Id = instruction.Id,
+            Text = instruction.Text,
+            SortOrder = instruction.SortOrder,
+            InstructionSectionId = instructionSectionId
         };
     }
 }

@@ -36,7 +36,7 @@ const RecipePage = () => {
         const fetchRecipe = async () => {
             const existingRecipe = await getRecipeById(Number(id));
             if (existingRecipe) {
-                existingRecipe.instructions.sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
+                existingRecipe.instructions?.sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
                 setRecipe(existingRecipe);
                 setPortions(existingRecipe.servings);
                 return;
@@ -66,6 +66,18 @@ const RecipePage = () => {
         (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
     );
     const orderedSections = sortedSections.filter((section) => !section.isUncategorized && section.id != null);
+
+    const sortedInstructionSections = [...(recipe.instructionSections ?? [])].sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const uncategorizedInstructionSection =
+        sortedInstructionSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+    const rootInstructions = (uncategorizedInstructionSection?.instructions ?? recipe.instructions ?? []).slice().sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const orderedInstructionSections = sortedInstructionSections.filter(
+        (section) => !section.isUncategorized && section.id != null
+    );
 
     const handlePortionsChange = (newPortions: number) => {
         setRecipe(prevRecipe => {
@@ -159,10 +171,25 @@ const RecipePage = () => {
                     {!isMobile && <Header />}
                     <h3>Instruktioner</h3>
                     <ol>
-                        {recipe.instructions.map((instruction, index) => (
+                        {rootInstructions.map((instruction, index) => (
                             <li key={index}>{instruction.text}</li>
                         ))}
                     </ol>
+                    {orderedInstructionSections.map((section) => (
+                        <div key={`instruction-section-${section.id}`} className="recipe-ingredient-section">
+                            <h4>{section.name}</h4>
+                            <ol>
+                                {section.instructions
+                                    .slice()
+                                    .sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0))
+                                    .map((instruction, index) => (
+                                        <li key={`instruction-section-${section.id}-${instruction.id ?? index}`}>
+                                            {instruction.text}
+                                        </li>
+                                    ))}
+                            </ol>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

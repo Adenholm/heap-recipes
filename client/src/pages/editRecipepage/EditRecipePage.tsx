@@ -19,8 +19,23 @@ const splitIngredientSections = (sections?: IngredientSection[]) => {
     };
 };
 
+const splitInstructionSections = (sections?: InstructionSection[]) => {
+    const sortedSections = [...(sections ?? [])].sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const uncategorizedSection = sortedSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+
+    return {
+        instructions: uncategorizedSection?.instructions ?? [],
+        instructionSections: sortedSections.filter((section) => !section.isUncategorized && section.id != null),
+    };
+};
+
 const getLegacyRootIngredients = (recipe: Recipe) =>
     recipe.ingredients?.filter((ingredient) => ingredient.ingredientSectionId == null) ?? [];
+
+const getLegacyRootInstructions = (recipe: Recipe) =>
+    recipe.instructions?.filter((instruction) => instruction.instructionSectionId == null) ?? [];
 
 const EditRecipePage = () => {
     const { getRecipeById, editRecipe} = useRecipes();
@@ -48,6 +63,8 @@ const EditRecipePage = () => {
         { text: "", sortOrder: 0 },
     ]);
 
+    const [instructionSections, setInstructionSections] = useState<InstructionSection[]>([]);
+
     const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
 
     useEffect(() => {
@@ -64,7 +81,16 @@ const EditRecipePage = () => {
                         : [{ quantity: "", name: "", sortOrder: 0 }]
             );
             setIngredientSections(sectionState.ingredientSections);
-            setInstructions(data.instructions.length ? data.instructions : [{ text: "", sortOrder: 0 }]);
+            const instructionSectionState = splitInstructionSections(data.instructionSections);
+            const legacyRootInstructions = getLegacyRootInstructions(data);
+            setInstructions(
+                instructionSectionState.instructions.length
+                    ? instructionSectionState.instructions
+                    : legacyRootInstructions.length
+                        ? legacyRootInstructions
+                        : [{ text: "", sortOrder: 0 }]
+            );
+            setInstructionSections(instructionSectionState.instructionSections);
             setTags(data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
             setLoading(false);
         };
@@ -115,8 +141,22 @@ const EditRecipePage = () => {
                         })),
                 })),
             instructions: instructions
-                .filter(inst => inst.text.trim() !== "")
+                .filter((inst) => inst.text.trim() !== "" && inst.instructionSectionId == null)
                 .map((inst, index) => ({ id: inst.id, text: inst.text, sortOrder: inst.sortOrder ?? index })),
+            instructionSections: instructionSections
+                .filter((section) => section.name.trim() !== "")
+                .map((section, index) => ({
+                    id: section.id,
+                    name: section.name,
+                    sortOrder: section.sortOrder ?? index,
+                    instructions: section.instructions
+                        .filter((instruction) => instruction.text.trim() !== "")
+                        .map((instruction, instructionIndex) => ({
+                            id: instruction.id,
+                            text: instruction.text,
+                            sortOrder: instruction.sortOrder ?? instructionIndex,
+                        })),
+                })),
             tags: tags.map(tag => ({ name: tag.label }))
         };
         console.log(updatedRecipe);
@@ -143,7 +183,13 @@ const EditRecipePage = () => {
                         setIngredientSections={setIngredientSections}
                         resetKey={recipe.id ?? "new"}
                     />
-                    <StepThree instructions={instructions} setInstructions={setInstructions} />
+                    <StepThree
+                        instructions={instructions}
+                        instructionSections={instructionSections}
+                        setInstructions={setInstructions}
+                        setInstructionSections={setInstructionSections}
+                        resetKey={recipe.id ?? "new"}
+                    />
             </Stepper>
         </div>
     );
