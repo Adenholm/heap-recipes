@@ -18,11 +18,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
+    const initializeAuth = async() => {
+      const storedToken = localStorage.getItem('token');
+      if (!storedToken) return;
+
+      const reponse = await api.get('/auth/me'); // Validate token on load
+      if (reponse.status !== 200) {
+        localStorage.removeItem('token');
+        return;
+      }
+
       setToken(storedToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
+    initializeAuth();
   }, []);
 
   useEffect(() => {
