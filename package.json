@@ -5,7 +5,9 @@
     "main": "index.js",
     "scripts": {
         "setup": "cd client && npm install",
-        "dev": "concurrently \"cd client && npm run dev\" \"cd server && dotnet run\"",
+        "client": "cd client && npm run dev",
+        "server": "cd server && dotnet run",
+        "dev": "concurrently \"npm run server\" \"npm run client\"",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
