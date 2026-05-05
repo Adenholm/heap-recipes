@@ -93,4 +93,6 @@ server/obj/*
 server/bin/*
 .fake
 
+
+# Local configuration files
 docker-compose.override.yml
