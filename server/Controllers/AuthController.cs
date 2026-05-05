@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using HeapRecipeApi.Data;
 using HeapRecipeApi.Services;
+using System.Security.Claims;
 
 namespace HeapRecipeApi.Controllers;
 
@@ -45,6 +47,25 @@ public class AuthController : ControllerBase
 
         var token = JwtTokenHelper.GenerateToken(user, _config);
         return Ok(new { token });
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null)
+            return Unauthorized();
+
+        var userId = int.Parse(userIdClaim);
+
+        var user = await _db.Users.FindAsync(userId);
+
+        if (user == null)
+            return NotFound();
+
+        return Ok(new { user.Id, user.Username, user.Role });
     }
 }
 

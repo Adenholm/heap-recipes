@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: heap_recipes
-      POSTGRES_USER: heap_user
-      POSTGRES_PASSWORD: superduperpassword
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -14,10 +14,13 @@ services:
     build: ./server
     container_name: heap_backend 
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=heap_recipes;Username=heap_user;Password=superduperpassword
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
       - JWT__Key=${JWT__Key}
-      - AllowedOrigins=http://localhost:3000;http://frontend;https://recipes.erik-persson.com
+      - Jwt__Issuer=${HeapRecipesApi}
+      - Jwt__Audience=${Jwt__Audience}
+      - Jwt__ExpireMinutes=${Jwt__ExpireMinutes}
+      - AllowedOrigins=${AllowedOrigins}
     depends_on:
       - db
     networks:

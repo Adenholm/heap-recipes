@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?
     .Split(';', StringSplitOptions.RemoveEmptyEntries)
-    ?? new[] { "http://localhost:3000" };
+    ?? new[] { };
 
 builder.Services.AddCors(options =>
     {
