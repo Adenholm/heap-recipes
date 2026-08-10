@@ -8,8 +8,10 @@ interface Recipe {
     title: string;
     description: string;
     imageUrl: string;
-    ingredients: Ingredient[];
-    instructions: Instruction[];
+    ingredients?: Ingredient[];
+    ingredientSections?: IngredientSection[];
+    instructions?: Instruction[];
+    instructionSections?: InstructionSection[];
     prepTime: number; // in minutes
     servings: number;
     tags: Tag[];
@@ -17,13 +19,37 @@ interface Recipe {
 
 interface Ingredient {
     id?: number;
+    clientId?: string;
     name: string;
     quantity: string; // e.g., "2 cups", "1 tbsp"
+    sortOrder?: number;
+    ingredientSectionId?: number | null;
+}
+
+interface IngredientSection {
+    id?: number | null;
+    clientId?: string;
+    isUncategorized?: boolean;
+    name: string;
+    sortOrder?: number;
+    ingredients: Ingredient[];
 }
 
 interface Instruction {
     id?: number;
+    clientId?: string;
     text: string;
+    sortOrder?: number;
+    instructionSectionId?: number | null;
+}
+
+interface InstructionSection {
+    id?: number | null;
+    clientId?: string;
+    isUncategorized?: boolean;
+    name: string;
+    sortOrder?: number;
+    instructions: Instruction[];
 }
 
 interface Tag {

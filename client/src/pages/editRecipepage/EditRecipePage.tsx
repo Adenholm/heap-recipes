@@ -4,9 +4,38 @@ import Stepper from "../../components/stepper/Stepper";
 import StepOne from "../../components/recipeForm/steps/StepOne";
 import StepTwo from "../../components/recipeForm/steps/StepTwo";
 import StepThree from "../../components/recipeForm/steps/StepThree";
-import api from "../../service/apiClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecipes } from "../../context/recipes";
+
+const splitIngredientSections = (sections?: IngredientSection[]) => {
+    const sortedSections = [...(sections ?? [])].sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const uncategorizedSection = sortedSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+
+    return {
+        ingredients: uncategorizedSection?.ingredients ?? [],
+        ingredientSections: sortedSections.filter((section) => !section.isUncategorized && section.id != null),
+    };
+};
+
+const splitInstructionSections = (sections?: InstructionSection[]) => {
+    const sortedSections = [...(sections ?? [])].sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const uncategorizedSection = sortedSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+
+    return {
+        instructions: uncategorizedSection?.instructions ?? [],
+        instructionSections: sortedSections.filter((section) => !section.isUncategorized && section.id != null),
+    };
+};
+
+const getLegacyRootIngredients = (recipe: Recipe) =>
+    recipe.ingredients?.filter((ingredient) => ingredient.ingredientSectionId == null) ?? [];
+
+const getLegacyRootInstructions = (recipe: Recipe) =>
+    recipe.instructions?.filter((instruction) => instruction.instructionSectionId == null) ?? [];
 
 const EditRecipePage = () => {
     const { getRecipeById, editRecipe} = useRecipes();
@@ -25,12 +54,16 @@ const EditRecipePage = () => {
     });
 
     const [ingredients, setIngredients] = useState<Ingredient[]>([
-        { quantity: "", name: "" },
+        { quantity: "", name: "", sortOrder: 0 },
     ]);
 
+    const [ingredientSections, setIngredientSections] = useState<IngredientSection[]>([]);
+
     const [instructions, setInstructions] = useState<Instruction[]>([
-        { text: "" },
+        { text: "", sortOrder: 0 },
     ]);
+
+    const [instructionSections, setInstructionSections] = useState<InstructionSection[]>([]);
 
     const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
 
@@ -38,8 +71,26 @@ const EditRecipePage = () => {
         const fetchRecipe = async () => {
             const data = await getRecipeById(Number(id));
             setRecipe(data);
-            setIngredients(data.ingredients.length ? data.ingredients : [{ quantity: "", name: "" }]);
-            setInstructions(data.instructions.length ? data.instructions : [{ text: "" }]);
+            const sectionState = splitIngredientSections(data.ingredientSections);
+            const legacyRootIngredients = getLegacyRootIngredients(data);
+            setIngredients(
+                sectionState.ingredients.length
+                    ? sectionState.ingredients
+                    : legacyRootIngredients.length
+                        ? legacyRootIngredients
+                        : [{ quantity: "", name: "", sortOrder: 0 }]
+            );
+            setIngredientSections(sectionState.ingredientSections);
+            const instructionSectionState = splitInstructionSections(data.instructionSections);
+            const legacyRootInstructions = getLegacyRootInstructions(data);
+            setInstructions(
+                instructionSectionState.instructions.length
+                    ? instructionSectionState.instructions
+                    : legacyRootInstructions.length
+                        ? legacyRootInstructions
+                        : [{ text: "", sortOrder: 0 }]
+            );
+            setInstructionSections(instructionSectionState.instructionSections);
             setTags(data.tags.map((tag: Tag) => ({ value: tag.id?.toString() || tag.name, label: tag.name })));
             setLoading(false);
         };
@@ -67,11 +118,45 @@ const EditRecipePage = () => {
         const updatedRecipe = {
             ...recipe,
             ingredients: ingredients
-                .filter(ing => ing.name.trim() !== "")
-                .map(ing => ({ id: ing.id, name: ing.name, quantity: ing.quantity })),
+                .filter((ing) => ing.name.trim() !== "" && ing.ingredientSectionId == null)
+                .map((ing, index) => ({
+                    id: ing.id,
+                    name: ing.name,
+                    quantity: ing.quantity,
+                    sortOrder: ing.sortOrder ?? index
+                })),
+            ingredientSections: ingredientSections
+                .filter((section) => section.name.trim() !== "")
+                .map((section, index) => ({
+                    id: section.id,
+                    name: section.name,
+                    sortOrder: section.sortOrder ?? index,
+                    ingredients: section.ingredients
+                        .filter((ingredient) => ingredient.name.trim() !== "")
+                        .map((ingredient, ingredientIndex) => ({
+                            id: ingredient.id,
+                            name: ingredient.name,
+                            quantity: ingredient.quantity,
+                            sortOrder: ingredient.sortOrder ?? ingredientIndex
+                        })),
+                })),
             instructions: instructions
-                .filter(inst => inst.text.trim() !== "")
-                .map(inst => ({ id: inst.id, text: inst.text })),
+                .filter((inst) => inst.text.trim() !== "" && inst.instructionSectionId == null)
+                .map((inst, index) => ({ id: inst.id, text: inst.text, sortOrder: inst.sortOrder ?? index })),
+            instructionSections: instructionSections
+                .filter((section) => section.name.trim() !== "")
+                .map((section, index) => ({
+                    id: section.id,
+                    name: section.name,
+                    sortOrder: section.sortOrder ?? index,
+                    instructions: section.instructions
+                        .filter((instruction) => instruction.text.trim() !== "")
+                        .map((instruction, instructionIndex) => ({
+                            id: instruction.id,
+                            text: instruction.text,
+                            sortOrder: instruction.sortOrder ?? instructionIndex,
+                        })),
+                })),
             tags: tags.map(tag => ({ name: tag.label }))
         };
         console.log(updatedRecipe);
@@ -91,8 +176,20 @@ const EditRecipePage = () => {
             <h1>Edit Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
                     <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />
-                    <StepTwo ingredients={ingredients} setIngredients={setIngredients} />
-                    <StepThree instructions={instructions} setInstructions={setInstructions} />
+                    <StepTwo
+                        ingredients={ingredients}
+                        ingredientSections={ingredientSections}
+                        setIngredients={setIngredients}
+                        setIngredientSections={setIngredientSections}
+                        resetKey={recipe.id ?? "new"}
+                    />
+                    <StepThree
+                        instructions={instructions}
+                        instructionSections={instructionSections}
+                        setInstructions={setInstructions}
+                        setInstructionSections={setInstructionSections}
+                        resetKey={recipe.id ?? "new"}
+                    />
             </Stepper>
         </div>
     );

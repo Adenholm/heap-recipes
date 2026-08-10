@@ -2,6 +2,7 @@
 using HeapRecipeApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HeapReacipesApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260419190258_AddInstructionSortOrder")]
+    partial class AddInstructionSortOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,9 +90,6 @@ namespace HeapReacipesApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("InstructionSectionId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("RecipeId")
                         .HasColumnType("integer");
 
@@ -102,36 +102,9 @@ namespace HeapReacipesApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InstructionSectionId");
-
                     b.HasIndex("RecipeId");
 
                     b.ToTable("Instructions");
-                });
-
-            modelBuilder.Entity("HeapRecipeApi.Data.InstructionSection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("InstructionSections");
                 });
 
             modelBuilder.Entity("HeapRecipeApi.Data.Recipe", b =>
@@ -250,26 +223,8 @@ namespace HeapReacipesApi.Migrations
 
             modelBuilder.Entity("HeapRecipeApi.Data.Instruction", b =>
                 {
-                    b.HasOne("HeapRecipeApi.Data.InstructionSection", "InstructionSection")
-                        .WithMany("Instructions")
-                        .HasForeignKey("InstructionSectionId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
                         .WithMany("Instructions")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("InstructionSection");
-
-                    b.Navigation("Recipe");
-                });
-
-            modelBuilder.Entity("HeapRecipeApi.Data.InstructionSection", b =>
-                {
-                    b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
-                        .WithMany("InstructionSections")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -297,18 +252,11 @@ namespace HeapReacipesApi.Migrations
                     b.Navigation("Ingredients");
                 });
 
-            modelBuilder.Entity("HeapRecipeApi.Data.InstructionSection", b =>
-                {
-                    b.Navigation("Instructions");
-                });
-
             modelBuilder.Entity("HeapRecipeApi.Data.Recipe", b =>
                 {
                     b.Navigation("IngredientSections");
 
                     b.Navigation("Ingredients");
-
-                    b.Navigation("InstructionSections");
 
                     b.Navigation("Instructions");
                 });
