@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?
     .Split(';', StringSplitOptions.RemoveEmptyEntries)
-    ?? new[] { };
+    ?? Array.Empty<string>();
 
 builder.Services.AddCors(options =>
     {
