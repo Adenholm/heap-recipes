@@ -21,6 +21,9 @@ services:
       - Jwt__Audience=${Jwt__Audience}
       - Jwt__ExpireMinutes=${Jwt__ExpireMinutes}
       - AllowedOrigins=${AllowedOrigins}
+      - UploadPath=/app/uploads
+    volumes:
+      - recipe_uploads:/app/uploads
     depends_on:
       - db
     networks:
@@ -41,3 +44,4 @@ networks:
 
 volumes:
   postgres_data:
+  recipe_uploads:

@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using HeapRecipeApi.Data;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure EF Core with PostgreSQL
@@ -82,6 +83,13 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+var configuredUploadPath = builder.Configuration["UploadPath"];
+var uploadPath = Path.IsPathRooted(configuredUploadPath ?? string.Empty)
+    ? configuredUploadPath!
+    : Path.Combine(builder.Environment.ContentRootPath, configuredUploadPath ?? "uploads");
+
+Directory.CreateDirectory(uploadPath);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -97,6 +105,11 @@ using (var scope = app.Services.CreateScope())
 app.MapGet("/health", () => Results.Ok("Healthy!"));
 app.UseCors("AllowConfiguredOrigins");
 app.UseHttpsRedirection();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadPath),
+    RequestPath = "/uploads"
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
