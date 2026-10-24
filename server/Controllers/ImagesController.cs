@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ImageMagick;
 
 namespace HeapRecipeApi.Controllers;
 
@@ -7,7 +8,11 @@ namespace HeapRecipeApi.Controllers;
 [Route("api/images")]
 public class ImagesController : ControllerBase
 {
-    private static readonly string[] Allowed = [".jpg", ".jpeg", ".png", ".webp"];
+    private static readonly HashSet<string> AllowedContentTypes =
+        ["image/jpeg", "image/png", "image/webp"];
+    private const long MaxUploadSize = 10_000_000;
+    private const int MaxInputDimension = 10_000;
+    private const int MaxOutputDimension = 1_600;
     private readonly string _uploadPath;
 
     public ImagesController(IConfiguration config, IWebHostEnvironment environment)
@@ -20,22 +25,42 @@ public class ImagesController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    [RequestSizeLimit(5_000_000)] // 5 MB
+    [RequestSizeLimit(MaxUploadSize)]
     public async Task<IActionResult> Upload([FromForm] IFormFile file)
     {
         if (file is null || file.Length == 0)
             return BadRequest("Ingen fil skickades");
 
-        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!Allowed.Contains(ext))
+        if (!AllowedContentTypes.Contains(file.ContentType.ToLowerInvariant()))
             return BadRequest("Filtypen stöds inte");
 
-        var name = $"{Guid.NewGuid()}{ext}"; // använd aldrig användarens filnamn
-        var fullPath = Path.Combine(_uploadPath, name);
+        try
+        {
+            await using var input = file.OpenReadStream();
+            using var image = new MagickImage(input);
+            image.AutoOrient();
 
-        await using var stream = System.IO.File.Create(fullPath);
-        await file.CopyToAsync(stream);
+            if (image.Width > MaxInputDimension || image.Height > MaxInputDimension)
+                return BadRequest("Bildens dimensioner är för stora");
 
-        return Ok(new { url = $"/uploads/{name}" });
+            if (image.Width > MaxOutputDimension || image.Height > MaxOutputDimension)
+                image.Resize(new MagickGeometry(MaxOutputDimension, MaxOutputDimension)
+                {
+                    IgnoreAspectRatio = false
+                });
+
+            var name = $"{Guid.NewGuid():N}.webp";
+            var fullPath = Path.Combine(_uploadPath, name);
+
+            image.Format = MagickFormat.WebP;
+            image.Quality = 82;
+            await image.WriteAsync(fullPath);
+
+            return Ok(new { url = $"/uploads/{name}" });
+        }
+        catch (MagickException)
+        {
+            return BadRequest("Filen är inte en giltig bild");
+        }
     }
 }
