@@ -29,6 +29,9 @@ namespace HeapReacipesApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("IngredientSectionId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -39,11 +42,41 @@ namespace HeapReacipesApi.Migrations
                     b.Property<int>("RecipeId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("IngredientSectionId");
 
                     b.HasIndex("RecipeId");
 
                     b.ToTable("Ingredients");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.IngredientSection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("IngredientSections");
                 });
 
             modelBuilder.Entity("HeapRecipeApi.Data.Instruction", b =>
@@ -54,7 +87,13 @@ namespace HeapReacipesApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("InstructionSectionId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
                     b.Property<string>("Text")
@@ -63,9 +102,36 @@ namespace HeapReacipesApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("InstructionSectionId");
+
                     b.HasIndex("RecipeId");
 
                     b.ToTable("Instructions");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.InstructionSection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("InstructionSections");
                 });
 
             modelBuilder.Entity("HeapRecipeApi.Data.Recipe", b =>
@@ -155,8 +221,26 @@ namespace HeapReacipesApi.Migrations
 
             modelBuilder.Entity("HeapRecipeApi.Data.Ingredient", b =>
                 {
+                    b.HasOne("HeapRecipeApi.Data.IngredientSection", "IngredientSection")
+                        .WithMany("Ingredients")
+                        .HasForeignKey("IngredientSectionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
                         .WithMany("Ingredients")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IngredientSection");
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.IngredientSection", b =>
+                {
+                    b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
+                        .WithMany("IngredientSections")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -166,8 +250,26 @@ namespace HeapReacipesApi.Migrations
 
             modelBuilder.Entity("HeapRecipeApi.Data.Instruction", b =>
                 {
+                    b.HasOne("HeapRecipeApi.Data.InstructionSection", "InstructionSection")
+                        .WithMany("Instructions")
+                        .HasForeignKey("InstructionSectionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
                         .WithMany("Instructions")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InstructionSection");
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.InstructionSection", b =>
+                {
+                    b.HasOne("HeapRecipeApi.Data.Recipe", "Recipe")
+                        .WithMany("InstructionSections")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -190,9 +292,23 @@ namespace HeapReacipesApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("HeapRecipeApi.Data.Recipe", b =>
+            modelBuilder.Entity("HeapRecipeApi.Data.IngredientSection", b =>
                 {
                     b.Navigation("Ingredients");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.InstructionSection", b =>
+                {
+                    b.Navigation("Instructions");
+                });
+
+            modelBuilder.Entity("HeapRecipeApi.Data.Recipe", b =>
+                {
+                    b.Navigation("IngredientSections");
+
+                    b.Navigation("Ingredients");
+
+                    b.Navigation("InstructionSections");
 
                     b.Navigation("Instructions");
                 });

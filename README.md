@@ -50,21 +50,19 @@ Replace YOUR_USERNAME and A_STRONG_PASSWORD with your PostgreSQL credentials.
 }
 ```
 
-4. Frontend configuration (optional)
 
-```bash
-cp .env.example .env
+
+5. To set up a database for development, you may create a ´´´docker-compose.override.yml´´´ file with the following content:
+
+```yaml
+services:
+  db:
+    ports:
+      - "5432:5432"
 ```
-Available variables:
+This will expose the docker database to port 5432 on your local machine, allowing you to connect to it
 
-- `VITE_API_BASE_URL`: 
-    - Base URL for the backend API 
-    - Optional: defaults to /api (handled via proxy)
-    - Must start with VITE_ to be accessible in Vite
-
-
-
-5. Create a user
+6. Create a user
 
 Send a POST request to: `/api/auth/register`
 
@@ -81,8 +79,6 @@ Example request body:
 # Notes
 
 * JWT Tokens uses HS256 and must therefore be at least 32 characters, otherwise it will not work (and be insecure)
-
-
 
 
 

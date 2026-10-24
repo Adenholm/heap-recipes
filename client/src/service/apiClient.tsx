@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: '/api',
 });
 
 // Request interceptor to add JWT token
@@ -24,7 +24,6 @@ api.interceptors.response.use(
       // Optionally redirect to login or clear token
       console.warn('Unauthorized, redirect to login');
       localStorage.removeItem('token');
-      window.location.href = '/';
     }
     return Promise.reject(error);
   }

@@ -36,7 +36,8 @@ const LoginModal = () => {
         closeModal();
       })
       .catch((error) => {
-        setErr(error.message);
+        if (error.response.status && error.response.status === 401) setErr('Invalid username or password');
+        else setErr(error.message);
         setTimeout(() => setErr(''), 3000);
       });
   };
@@ -44,8 +45,8 @@ const LoginModal = () => {
   return (
     <form
         onSubmit={e => {
-        e.preventDefault();
-        onSubmit();
+          e.preventDefault();
+          onSubmit();
         }}
     >
         <div>

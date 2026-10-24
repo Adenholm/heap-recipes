@@ -20,13 +20,16 @@
 }
 
 button {
-    font-family: 'Josefin Sans', sans-serif;
     background-color: #8EA16F;
     color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 6px;
     cursor: pointer;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Josefin Sans', sans-serif;
 }
 
 textarea {

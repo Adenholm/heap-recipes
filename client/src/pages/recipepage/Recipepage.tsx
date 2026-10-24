@@ -36,8 +36,7 @@ const RecipePage = () => {
         const fetchRecipe = async () => {
             const existingRecipe = await getRecipeById(Number(id));
             if (existingRecipe) {
-                existingRecipe.instructions.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-                existingRecipe.ingredients.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+                existingRecipe.instructions?.sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0));
                 setRecipe(existingRecipe);
                 setPortions(existingRecipe.servings);
                 return;
@@ -59,15 +58,39 @@ const RecipePage = () => {
         openModal();
     };
 
+    const sortedSections = [...(recipe.ingredientSections ?? [])].sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const uncategorizedSection = sortedSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+    const rootIngredients = (uncategorizedSection?.ingredients ?? recipe.ingredients ?? []).slice().sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const orderedSections = sortedSections.filter((section) => !section.isUncategorized && section.id != null);
+
+    const sortedInstructionSections = [...(recipe.instructionSections ?? [])].sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const uncategorizedInstructionSection =
+        sortedInstructionSections.find((section) => section.isUncategorized || section.id == null) ?? null;
+    const rootInstructions = (uncategorizedInstructionSection?.instructions ?? recipe.instructions ?? []).slice().sort(
+        (a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0)
+    );
+    const orderedInstructionSections = sortedInstructionSections.filter(
+        (section) => !section.isUncategorized && section.id != null
+    );
+
     const handlePortionsChange = (newPortions: number) => {
         setRecipe(prevRecipe => {
             if (!prevRecipe) return null;
-            const updatedIngredients = prevRecipe.ingredients.map(ingredient => ({
-                ...ingredient,
-                quantity: scaleQuantity(ingredient.quantity, newPortions / portions)
+            const updatedIngredientSections = (prevRecipe.ingredientSections ?? []).map((section) => ({
+                ...section,
+                ingredients: section.ingredients.map((ingredient) => ({
+                    ...ingredient,
+                    quantity: scaleQuantity(ingredient.quantity, newPortions / portions),
+                })),
             }));
             setPortions(newPortions);
-            return { ...prevRecipe, ingredients: updatedIngredients };
+            return { ...prevRecipe, ingredientSections: updatedIngredientSections };
         });
     };
 
@@ -124,19 +147,49 @@ const RecipePage = () => {
                         </div>
                     </div>
                     <ul>
-                        {recipe.ingredients.map((ingredient, index) => (
-                            <li key={index}><strong>{ingredient.quantity}</strong> <p>{ingredient.name}</p></li>
+                        {rootIngredients.map((ingredient, index) => (
+                            <li key={`root-${ingredient.id ?? index}`}><strong>{ingredient.quantity}</strong> <p>{ingredient.name}</p></li>
                         ))}
                     </ul>
+                    {orderedSections.map((section) => (
+                        <div key={`section-${section.id}`} className="recipe-ingredient-section">
+                            <h4>{section.name}</h4>
+                            <ul>
+                                {section.ingredients
+                                    .slice()
+                                    .sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0))
+                                    .map((ingredient, index) => (
+                                        <li key={`section-${section.id}-${ingredient.id ?? index}`}>
+                                            <strong>{ingredient.quantity}</strong> <p>{ingredient.name}</p>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </div>
+                    ))}
                 </aside>
                 <div>
                     {!isMobile && <Header />}
                     <h3>Instruktioner</h3>
                     <ol>
-                        {recipe.instructions.map((instruction, index) => (
+                        {rootInstructions.map((instruction, index) => (
                             <li key={index}>{instruction.text}</li>
                         ))}
                     </ol>
+                    {orderedInstructionSections.map((section) => (
+                        <div key={`instruction-section-${section.id}`} className="recipe-ingredient-section">
+                            <h4>{section.name}</h4>
+                            <ol>
+                                {section.instructions
+                                    .slice()
+                                    .sort((a, b) => (a.sortOrder ?? a.id ?? 0) - (b.sortOrder ?? b.id ?? 0))
+                                    .map((instruction, index) => (
+                                        <li key={`instruction-section-${section.id}-${instruction.id ?? index}`}>
+                                            {instruction.text}
+                                        </li>
+                                    ))}
+                            </ol>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
