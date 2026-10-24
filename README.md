@@ -24,16 +24,17 @@ Based on experience from Erik Persson setting it up from scratch in March 2026. 
 ```bash
 npm install
 npm run setup
-``` 
+```
 
-2. Start the database
+## 2. Start the database
+
 ```bash
 docker compose up db
 ```
 
-3. Backend configuration
+## 3. Backend configuration
 
-Create the file: `server/appsettings.json`
+Create the file: `appsettings.Development.json`
 
 Replace YOUR_USERNAME and A_STRONG_PASSWORD with your PostgreSQL credentials.
 ```json
@@ -50,9 +51,38 @@ Replace YOUR_USERNAME and A_STRONG_PASSWORD with your PostgreSQL credentials.
 }
 ```
 
+## 4. Default user (optional)
 
+The backend can create a default user on startup. It is only created if both a username and a password are configured, so nothing is seeded unless you set them. The user gets the `Admin` role by default.
 
-5. To set up a database for development, you may create a ´´´docker-compose.override.yml´´´ file with the following content:
+For local development, store the credentials with [user secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) so they never end up in git. Run this from the `server` folder:
+
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "DefaultUser:Username" "admin"
+dotnet user-secrets set "DefaultUser:Password" "pick-something-strong"
+```
+
+Start the backend and the user is created automatically. Log in with `POST /api/auth/login`.
+
+For Docker or production, use environment variables instead (user secrets are only loaded in the `Development` environment):
+
+```
+DefaultUser__Username=admin
+DefaultUser__Password=your-strong-password
+```
+
+Optionally set `DefaultUser:Role` to use a different role than `Admin`.
+
+Where user secrets are stored on your machine:
+* Windows: `%APPDATA%\Microsoft\UserSecrets\<user_secrets_id>\secrets.json`
+* Linux / macOS: `~/.microsoft/usersecrets/<user_secrets_id>/secrets.json`
+
+The `<user_secrets_id>` is the `UserSecretsId` in `server/HeapReacipesApi.csproj`. Useful commands: `dotnet user-secrets list`, `remove "Key"`, `clear`.
+
+## 5. Expose the database locally (optional)
+
+To set up a database for development, you may create a `docker-compose.override.yml` file with the following content:
 
 ```yaml
 services:
@@ -62,23 +92,26 @@ services:
 ```
 This will expose the docker database to port 5432 on your local machine, allowing you to connect to it
 
-6. Create a user
+## 6. Create more users
 
 Send a POST request to: `/api/auth/register`
 
 Example request body:
 
-```
+```json
 {
-  "id": 1,
-  "username": "Hanna"
+  "username": "Hanna",
+  "password": "A_STRONG_PASSWORD"
 }
 ```
+
+New users registered this way get the `User` role.
 
 
 # Notes
 
 * JWT Tokens uses HS256 and must therefore be at least 32 characters, otherwise it will not work (and be insecure)
+* The default user is only created once. Changing `DefaultUser:Password` later does not update an existing user, so change the password through the app or delete the row from the database.
 
 
 
