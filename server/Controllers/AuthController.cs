@@ -20,6 +20,7 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
+    [Authorize]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
