@@ -5,6 +5,9 @@ import App from './App.js'
 import { AuthProvider } from './context/auth.js'
 import { ModalProvider } from './context/modal.js'
 import { RecipesProvider } from './context/recipes.js'
+import { registerSW } from 'virtual:pwa-register'
+
+registerSW({ immediate: true })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
