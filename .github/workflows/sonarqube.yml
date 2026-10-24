@@ -1,0 +1,51 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x   # match your project's target version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Install frontend dependencies
+        run: |
+          npm install
+          npm run setup
+
+      - name: Begin SonarQube analysis
+        run: |
+          dotnet sonarscanner begin \
+            /k:"heap-recipes" \
+            /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.exclusions="**/node_modules/**,**/bin/**,**/obj/**,**/dist/**,**/Migrations/**"
+
+      - name: Build backend
+        run: dotnet build server
+
+      - name: End SonarQube analysis
+        run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
