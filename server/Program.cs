@@ -95,6 +95,9 @@ using (var scope = app.Services.CreateScope())
 }
 await DbSeeder.SeedAsync(app.Services);
 
+if (app.Environment.IsDevelopment())
+    await DbSeeder.SeedExampleRecipesAsync(app.Services);
+
 app.MapGet("/health", () => Results.Ok("Healthy!"));
 app.UseCors("AllowConfiguredOrigins");
 app.UseHttpsRedirection();
