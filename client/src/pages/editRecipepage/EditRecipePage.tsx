@@ -175,7 +175,13 @@ const EditRecipePage = () => {
         <div className="container">
             <h1>Edit Recipe</h1>
                 <Stepper onComplete={handleSubmit}>
-                    <StepOne recipe={recipe} handleChange={handleChange} tags={tags} setTags={setTags} />
+                    <StepOne
+                        recipe={recipe}
+                        handleChange={handleChange}
+                        setImageUrl={(imageUrl) => setRecipe((current) => ({ ...current, imageUrl }))}
+                        tags={tags}
+                        setTags={setTags}
+                    />
                     <StepTwo
                         ingredients={ingredients}
                         ingredientSections={ingredientSections}
