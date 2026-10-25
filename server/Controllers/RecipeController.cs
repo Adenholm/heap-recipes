@@ -3,6 +3,7 @@ using HeapRecipeApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HeapRecipeApi.Services;
 
 namespace HeapRecipeApi.Controllers;
 
@@ -11,7 +12,13 @@ namespace HeapRecipeApi.Controllers;
 public class RecipesController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
-    public RecipesController(ApplicationDbContext db) => _db = db;
+    private readonly ImageStorage _imageStorage;
+
+    public RecipesController(ApplicationDbContext db, ImageStorage imageStorage)
+    {
+        _db = db;
+        _imageStorage = imageStorage;
+    }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RecipeReadDto>>> GetAll()
@@ -84,6 +91,7 @@ public class RecipesController : ControllerBase
 
         recipe.Title = dto.Title;
         recipe.Description = dto.Description;
+        var oldImageUrl = recipe.ImageUrl;
         recipe.ImageUrl = dto.ImageUrl;
         recipe.PrepTime = dto.PrepTime;
         recipe.Servings = dto.Servings;
@@ -91,6 +99,14 @@ public class RecipesController : ControllerBase
         ApplyRecipeDetails(recipe, dto);
 
         await _db.SaveChangesAsync();
+
+        if (!string.Equals(oldImageUrl, recipe.ImageUrl, StringComparison.OrdinalIgnoreCase) &&
+            _imageStorage.IsManagedUrl(oldImageUrl) &&
+            !await _db.Recipes.AnyAsync(r => r.ImageUrl == oldImageUrl))
+        {
+            _imageStorage.DeleteByUrl(oldImageUrl);
+        }
+
         return NoContent();
     }
 
@@ -102,8 +118,16 @@ public class RecipesController : ControllerBase
         var recipe = await _db.Recipes.FindAsync(id);
         if (recipe is null) return NotFound();
 
+        var imageUrl = recipe.ImageUrl;
         _db.Recipes.Remove(recipe);
         await _db.SaveChangesAsync();
+
+        if (_imageStorage.IsManagedUrl(imageUrl) &&
+            !await _db.Recipes.AnyAsync(r => r.ImageUrl == imageUrl))
+        {
+            _imageStorage.DeleteByUrl(imageUrl);
+        }
+
         return Ok();
     }
 

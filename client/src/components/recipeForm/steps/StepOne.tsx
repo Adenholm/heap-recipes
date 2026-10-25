@@ -1,78 +1,70 @@
 import TagInput from "../Taginput";
+import RecipeImageInput from "../imageInput/RecipeImageInput";
 import "../style.css";
-import placeHolderImage from '@/assets/images/ramen-black.svg'
 
 interface StepOneProps {
-  recipe: Recipe;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  tags: { value: string; label: string }[];
-  setTags: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
+    recipe: Recipe;
+    handleChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    setImageUrl: (imageUrl: string) => void;
+    tags: { value: string; label: string }[];
+    setTags: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
 }
 
-const StepOne = ({ recipe, handleChange, tags, setTags }: StepOneProps) => {
-  return (
-    <form className="recipe-form">
-        <div>
-            <label htmlFor="title">Title:</label>
-            <input
-                type="text"
-                id="title"
-                name="title"
-                value={recipe.title}
-                onChange={handleChange}
-                required
-            />
-        </div>
-        <div>
-            <label htmlFor="description">Description:</label>
-            <textarea
-                id="description"
-                name="description"
-                value={recipe.description}
-                onChange={handleChange}
-                required
-            />
-        </div>
-        <div className="two-input-row">
+const StepOne = ({ recipe, handleChange, setImageUrl, tags, setTags }: StepOneProps) => {
+    return (
+        <form className="recipe-form">
             <div>
-                <label htmlFor="prepTime">Time (minutes):</label>
+                <label htmlFor="title">Title:</label>
                 <input
-                    type="number"
-                    id="prepTime"
-                    name="prepTime"
-                    value={recipe.prepTime}
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={recipe.title}
                     onChange={handleChange}
                     required
                 />
             </div>
             <div>
-                <label htmlFor="servings">Servings:</label>
-                <input
-                    type="number"
-                    id="servings"
-                    name="servings"
-                    value={recipe.servings}
+                <label htmlFor="description">Description:</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    value={recipe.description}
                     onChange={handleChange}
                     required
                 />
             </div>
-        </div>
-        <TagInput selectedTags={tags} setSelectedTags={setTags} />
-        <div>
-            <label htmlFor="imageUrl">Image URL:</label>
-            <input
-                type="text"
-                id="imageUrl"
-                name="imageUrl"
-                value={recipe.imageUrl}
-                onChange={handleChange}
+            <div className="two-input-row">
+                <div>
+                    <label htmlFor="prepTime">Time (minutes):</label>
+                    <input
+                        type="number"
+                        id="prepTime"
+                        name="prepTime"
+                        value={recipe.prepTime}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="servings">Servings:</label>
+                    <input
+                        type="number"
+                        id="servings"
+                        name="servings"
+                        value={recipe.servings}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+            </div>
+            <TagInput selectedTags={tags} setSelectedTags={setTags} />
+            <RecipeImageInput
+                imageUrl={recipe.imageUrl}
+                onImageUrlChange={setImageUrl}
             />
-        </div>
-        <div>
-            <label htmlFor="imagePreview">Image Preview:</label>
-        <img src={recipe.imageUrl || placeHolderImage} alt="Image Preview" className="image-preview" />
-        </div>
-    </form>
-  );
+        </form>
+    );
 };
+
 export default StepOne;
