@@ -6,11 +6,14 @@ using HeapRecipeApi.Data;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
+using HeapRecipeApi.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure EF Core with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton<ImageStorage>();
+builder.Services.AddHostedService<OrphanImageCleaner>();
 
 // Configure JWT options
 var jwtSection = builder.Configuration.GetSection("Jwt");

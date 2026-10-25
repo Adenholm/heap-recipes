@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ImageMagick;
+using HeapRecipeApi.Services;
 
 namespace HeapRecipeApi.Controllers;
 
@@ -15,13 +16,7 @@ public class ImagesController : ControllerBase
     private const int MaxOutputDimension = 1_600;
     private readonly string _uploadPath;
 
-    public ImagesController(IConfiguration config, IWebHostEnvironment environment)
-    {
-        var configuredUploadPath = config["UploadPath"] ?? "uploads";
-        _uploadPath = Path.IsPathRooted(configuredUploadPath)
-            ? configuredUploadPath
-            : Path.Combine(environment.ContentRootPath, configuredUploadPath);
-    }
+    public ImagesController(ImageStorage storage) => _uploadPath = storage.UploadPath;
 
     [Authorize]
     [HttpPost]
