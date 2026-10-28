@@ -24,7 +24,41 @@ export default defineConfig({
         react(),
         VitePWA({
             registerType: 'autoUpdate',
-            manifest: false, // using public/manifest.json
+            manifest: {
+                name: 'Erik & Hannas Recept',
+                short_name: 'Heap',
+                start_url: '/',
+                display: 'fullscreen',
+                display_override: ['fullscreen', 'standalone'],
+                background_color: '#8EA16F',
+                theme_color: '#8EA16F',
+                icons: [
+                    {
+                        src: '/icons/icon-192x192.png',
+                        sizes: '192x192',
+                        type: 'image/png',
+                        purpose: 'any',
+                    },
+                    {
+                        src: '/icons/icon-192x192-maskable.png',
+                        sizes: '192x192',
+                        type: 'image/png',
+                        purpose: 'maskable',
+                    },
+                    {
+                        src: '/icons/icon-512x512.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                        purpose: 'any',
+                    },
+                    {
+                        src: '/icons/icon-512x512-maskable.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                        purpose: 'maskable',
+                    },
+                ],
+            },
             workbox: { navigateFallback: '/index.html' },
         }),
     ],
