@@ -102,8 +102,21 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    for (var attempt = 1; ; attempt++)
+    {
+        try
+        {
+            db.Database.Migrate();
+            break;
+        }
+        catch (Exception ex) when (attempt < 15)
+        {
+            app.Logger.LogWarning(ex, "Tried to migrate but DB was not ready, retry {Attempt}/10", attempt);
+            Thread.Sleep(3000);
+        }
+    }
 }
+
 await DbSeeder.SeedAsync(app.Services);
 
 if (app.Environment.IsDevelopment())

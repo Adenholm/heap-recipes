@@ -2,8 +2,8 @@ name: Build Test (Compile Only)
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - main
 
 jobs:
   build-test:
