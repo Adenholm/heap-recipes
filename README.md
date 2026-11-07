@@ -81,6 +81,33 @@ Where user secrets are stored on your machine:
 
 The `<user_secrets_id>` is the `UserSecretsId` in `server/HeapReacipesApi.csproj`. Useful commands: `dotnet user-secrets list`, `remove "Key"`, `clear`.
 
+## Testing
+
+The frontend uses [Vitest](https://vitest.dev/) with React Testing Library.
+
+Run the frontend tests from the repository root:
+
+```bash
+cd client
+npm test
+```
+
+Run the tests in watch mode while developing:
+
+```bash
+cd client
+npm run test:watch
+```
+
+Generate an HTML, LCOV, and terminal coverage report:
+
+```bash
+cd client
+npm run test:coverage
+```
+
+Frontend tests run automatically in the `Test Coverage` GitHub Actions workflow. The generated LCOV report is also supplied to the SonarQube analysis workflow.
+
 ## 5. Expose the database locally (optional)
 
 To set up a database for development, you may create a `docker-compose.override.yml` file with the following content:
