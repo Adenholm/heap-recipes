@@ -57,4 +57,70 @@ describe('Mainpage', () => {
         expect(screen.getByRole('heading', { name: 'Apple Pie' })).toBeVisible();
         expect(screen.queryByRole('heading', { name: 'Creamy Ramen' })).not.toBeInTheDocument();
     });
+
+    it('shows loading, empty, and error states', () => {
+        useRecipesMock.mockReturnValue({
+            recipes: [],
+            tags: [],
+            loading: true,
+            error: null,
+        });
+        const { rerender } = render(
+            <BrowserRouter>
+                <Mainpage />
+            </BrowserRouter>,
+        );
+        expect(screen.getByText('Loading recipes...')).toBeVisible();
+
+        useRecipesMock.mockReturnValue({
+            recipes: [],
+            tags: [],
+            loading: false,
+            error: null,
+        });
+        rerender(
+            <BrowserRouter>
+                <Mainpage />
+            </BrowserRouter>,
+        );
+        expect(screen.getByText('No recipes found.')).toBeVisible();
+
+        useRecipesMock.mockReturnValue({
+            recipes,
+            tags: [],
+            loading: false,
+            error: 'Unable to load recipes',
+        });
+        rerender(
+            <BrowserRouter>
+                <Mainpage />
+            </BrowserRouter>,
+        );
+        expect(screen.getByText('Error loading recipes: Unable to load recipes')).toBeVisible();
+    });
+
+    it('shows all matching recipes again when a selected tag is toggled off', async () => {
+        const user = userEvent.setup();
+        useRecipesMock.mockReturnValue({
+            recipes,
+            tags: [{ id: 1, name: 'Quick' }, { id: 2, name: 'Dessert' }],
+            loading: false,
+            error: null,
+        });
+
+        render(
+            <BrowserRouter>
+                <Mainpage />
+            </BrowserRouter>,
+        );
+
+        const quickTag = screen.getByRole('button', { name: 'Quick' });
+        await user.click(quickTag);
+        expect(screen.getByRole('heading', { name: 'Creamy Ramen' })).toBeVisible();
+        expect(screen.queryByRole('heading', { name: 'Apple Pie' })).not.toBeInTheDocument();
+
+        await user.click(quickTag);
+        expect(screen.getByRole('heading', { name: 'Creamy Ramen' })).toBeVisible();
+        expect(screen.getByRole('heading', { name: 'Apple Pie' })).toBeVisible();
+    });
 });

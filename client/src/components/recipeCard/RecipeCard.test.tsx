@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
+import ramenIcon from '../../assets/images/ramen-black.svg';
 import RecipeCard from './RecipeCard';
 
 const recipe: Recipe = {
@@ -28,5 +29,18 @@ describe('RecipeCard', () => {
             'src',
             '/ramen.jpg',
         );
+    });
+
+    it('uses the fallback image when the recipe image fails to load', () => {
+        render(
+            <BrowserRouter>
+                <RecipeCard recipe={{ ...recipe, imageUrl: '/missing.jpg' }} />
+            </BrowserRouter>,
+        );
+
+        const image = screen.getByRole('img', { name: 'Creamy Ramen' });
+        fireEvent.error(image);
+
+        expect(image).toHaveAttribute('src', ramenIcon);
     });
 });
