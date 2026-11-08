@@ -14,14 +14,16 @@ jobs:
       packages: write
 
     env:
-      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/heap-recipes-backend
       DOCKERHUB_BACKEND_IMAGE: adenholm/heap-recipes-backend
       SHA_TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
+      - name: Set lowercase image name
+        run: echo "BACKEND_IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/backend" >> "$GITHUB_ENV"
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -61,13 +63,15 @@ jobs:
       packages: write
 
     env:
-      FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/heap-recipes-frontend
       DOCKERHUB_FRONTEND_IMAGE: adenholm/heap-recipes-frontend
       SHA_TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set lowercase image name
+        run: echo "FRONTEND_IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/frontend" >> "$GITHUB_ENV"
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
