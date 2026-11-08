@@ -1,11 +1,37 @@
-name: Build Test (Compile Only)
+name: Test
 
 on:
   push:
-    branches-ignore:
-      - main
+    branches:
+      - '**'
+  pull_request:
+  workflow_dispatch:
 
 jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./client
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ./client/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run frontend tests
+        run: npm test
+
   build-test:
     runs-on: ubuntu-latest
 

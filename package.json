@@ -8,7 +8,7 @@
         "client": "cd client && npm run dev",
         "server": "cd server && dotnet run",
         "dev": "concurrently \"npm run server\" \"npm run client\"",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Only fontend tests are implemented yet, testing them now...\" && cd client && npm test"
     },
     "keywords": [
         "recipes"
