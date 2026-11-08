@@ -102,16 +102,17 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    for (var attempt = 1; ; attempt++)
+    int maxAttempts = 15;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++)
     {
         try
         {
             db.Database.Migrate();
             break;
         }
-        catch (Exception ex) when (attempt < 15)
+        catch (Exception ex)
         {
-            app.Logger.LogWarning(ex, "Tried to migrate but DB was not ready, retry {Attempt}/10", attempt);
+            app.Logger.LogWarning(ex, "Tried to migrate but DB was not ready, retry {Attempt}/{MaxAttempts}", attempt, maxAttempts);
             Thread.Sleep(3000);
         }
     }
