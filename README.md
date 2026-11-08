@@ -1,6 +1,7 @@
 # Heap-recipes
 [![Last Commit][last-commit-shield]][last-commit-url]
 [![Repo Size][repo-size-shield]][repo-size-url]
+[![Test Coverage][coverage-shield]][coverage-url]
 [![Author1][author-shield1]][author-url1]
 [![Author2][author-shield2]][author-url2]
 
@@ -80,6 +81,33 @@ Where user secrets are stored on your machine:
 
 The `<user_secrets_id>` is the `UserSecretsId` in `server/HeapReacipesApi.csproj`. Useful commands: `dotnet user-secrets list`, `remove "Key"`, `clear`.
 
+## Testing
+
+The frontend uses [Vitest](https://vitest.dev/) with React Testing Library.
+
+Run the frontend tests from the repository root:
+
+```bash
+cd client
+npm test
+```
+
+Run the tests in watch mode while developing:
+
+```bash
+cd client
+npm run test:watch
+```
+
+Generate an HTML, LCOV, and terminal coverage report:
+
+```bash
+cd client
+npm run test:coverage
+```
+
+Frontend tests run automatically in the `Test Coverage` GitHub Actions workflow. The generated LCOV report is also supplied to the SonarQube analysis workflow.
+
 ## 5. Expose the database locally (optional)
 
 To set up a database for development, you may create a `docker-compose.override.yml` file with the following content:
@@ -125,10 +153,10 @@ New users registered this way get the `User` role.
 [repo-size-shield]: https://img.shields.io/github/repo-size/Adenholm/heap-recipes?style=for-the-badge&cacheSeconds=60
 [repo-size-url]: https://github.com/Adenholm/heap-recipes
 
-[author-shield1]: https://img.shields.io/badge/Author-Hanna%20Adenholm-blue?style=for-the-badge
+[author-shield1]: https://img.shields.io/badge/Author-Hanna%20Adenholm-purple?style=for-the-badge
 [author-url1]: https://github.com/Adenholm
 
-[author-shield2]: https://img.shields.io/badge/Author-Erik%20Persson-blue?style=for-the-badge
+[author-shield2]: https://img.shields.io/badge/Author-Erik%20Persson-purple?style=for-the-badge
 [author-url2]: https://github.com/erikpersson0884
 
 
@@ -138,6 +166,10 @@ New users registered this way get the `User` role.
 [build-shield]: https://img.shields.io/github/actions/workflow/status/Adenholm/heap-recipes/.github/workflows/tests.yml?branch=main&style=for-the-badge
 [build-url]: https://github.com/Adenholm/heap-recipes/actions
 
+
+<!-- Test coverage shield -->
+[coverage-shield]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/adenholm/heap-recipes/coverage/.github/coverage.json&style=for-the-badge&v=2
+[coverage-url]: https://github.com/adenholm/heap-recipes/actions
 
 <!-- Frameworks & Languages Shields -->
 [vite-shield]: https://img.shields.io/badge/Vite-646CFF?logo=Vite&logoColor=white&style=for-the-badge

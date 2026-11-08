@@ -67,4 +67,24 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
+    test: {
+        environment: 'jsdom',
+        setupFiles: './src/test/setup.ts',
+        css: true,
+
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'html', 'lcov'],
+            include: ['src/**/*.{ts,tsx}'],
+            exclude: [
+                'src/assets/**',
+                'src/**/*.css',
+                'src/test/**',
+                'src/**/*.d.ts',
+                'src/types/**',
+                'src/main.tsx',
+                'src/App.tsx',
+            ],
+        },
+    },
 })
