@@ -315,9 +315,31 @@ Docker images, and publishes coverage data from the `main` branch.
 - Development startup seeds example recipes only when the database has no recipes.
 
 
+# Authors
 
 
-
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Adenholm">
+        <img src="https://github.com/Adenholm.png?size=100" alt="Hanna Adenholm" width="100" height="100" />
+      </a>
+      <br />
+      <strong><a href="https://github.com/Adenholm">Hanna Adenholm</a></strong>
+      <br />
+      <sub>Co-Creator &amp; Maintainer</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/erikpersson0884">
+        <img src="https://github.com/erikpersson0884.png?size=100" alt="Erik Persson" width="100" height="100" />
+      </a>
+      <br />
+      <strong><a href="https://github.com/erikpersson0884">Erik Persson</a></strong>
+      <br />
+      <sub>Co-Creator &amp; Maintainer</sub>
+    </td>
+  </tr>
+</table>
 
 <!-- Repo info shields -->
 [last-commit-shield]: https://img.shields.io/github/last-commit/Adenholm/heap-recipes/main?style=for-the-badge&cacheSeconds=30
