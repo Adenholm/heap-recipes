@@ -1,4 +1,4 @@
-import './style.css';
+import '@/components/stepper/style.css';
 
 type StepsProps = {
   maxSteps: number;

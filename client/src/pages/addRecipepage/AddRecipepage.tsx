@@ -1,11 +1,11 @@
 import { useState } from "react";
-import './style.css';
-import Stepper from "../../components/stepper/Stepper";
-import StepOne from "../../components/recipeForm/steps/StepOne";
-import StepTwo from "../../components/recipeForm/steps/StepTwo";
-import StepThree from "../../components/recipeForm/steps/StepThree";
+import '@/pages/addRecipepage/style.css';
+import Stepper from "@/components/stepper/Stepper";
+import StepOne from "@/components/recipeForm/steps/StepOne";
+import StepTwo from "@/components/recipeForm/steps/StepTwo";
+import StepThree from "@/components/recipeForm/steps/StepThree";
 import { useNavigate } from "react-router-dom";
-import { useRecipes } from "../../context/recipes";
+import { useRecipes } from "@/context/recipes";
 
 const AddRecipePage = () => {
     const { addRecipe} = useRecipes();
