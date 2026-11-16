@@ -61,6 +61,36 @@
     margin-top: 2rem;
 }
 
+.load-error {
+    box-sizing: border-box;
+    width: calc(100% - 2rem);
+    max-width: 32rem;
+    margin: 2rem auto;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--color-offwhite);
+    border-radius: 0.75rem;
+    color: var(--color-gray1);
+    overflow-wrap: anywhere;
+}
+
+.load-error p {
+    margin: 0;
+}
+
+.load-error p + p {
+    margin-top: 0.5rem;
+}
+
+.load-error .load-error-title {
+    color: var(--color-green);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.load-error .load-error-detail {
+    font-size: 0.875rem;
+}
+
 @media (max-width: 768px) {
     
     .search-bar {

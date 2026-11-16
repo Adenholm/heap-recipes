@@ -11,44 +11,56 @@ export const useRecipes = (): RecipesContextType => {
   return context;
 };
 
+const RETRY_DELAY_MS = 5000;
+
+function useRetriedFetch<T>(path: string, setData: React.Dispatch<React.SetStateAction<T>>) {
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const request = React.useRef<AbortController | null>(null);
+  const retryTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchData = React.useCallback(async () => {
+    request.current?.abort();
+    if (retryTimer.current) clearTimeout(retryTimer.current);
+    const controller = new AbortController();
+    request.current = controller;
+
+    const attempt = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get<T>(path, { signal: controller.signal });
+        if (controller.signal.aborted) return;
+        setData(response.data);
+        setError(null);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        setError(err instanceof Error ? err.message : `Unable to load ${path.slice(1)}`);
+        retryTimer.current = setTimeout(attempt, RETRY_DELAY_MS);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    };
+
+    await attempt();
+  }, [path, setData]);
+
+  React.useEffect(() => {
+    void fetchData();
+    return () => {
+      request.current?.abort();
+      if (retryTimer.current) clearTimeout(retryTimer.current);
+    };
+  }, [fetchData]);
+
+  return { fetchData, loading, error };
+}
+
 export const RecipesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [recipes, setRecipes] = React.useState<Recipe[]>([]);
   const [tags, setTags] = React.useState<Tag[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
-
-  const fetchRecipes = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.get('/recipes');
-      setRecipes(response.data);
-    } catch (err) {
-      console.error('Error fetching recipes:', err);
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchTags = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.get('/tags');
-      setTags(response.data);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchRecipes()
-    fetchTags()
-  }, []);
-
+  const { fetchData: fetchRecipes, loading, error: recipeError } = useRetriedFetch('/recipes', setRecipes);
+  const { fetchData: fetchTags, error: tagsError } = useRetriedFetch('/tags', setTags);
 
   const getRecipeById = async (id: number): Promise<Recipe> => {
     const found = recipes.find(r => r.id === id);
@@ -107,7 +119,9 @@ export const RecipesProvider: React.FC<{ children: React.ReactNode }> = ({ child
         recipes,
         tags,
         loading,
-        error,
+        error: recipeError ?? error,
+        recipeLoadError: recipeError,
+        tagsError,
         fetchRecipes,
         fetchTags,
         getRecipeById,
@@ -126,6 +140,8 @@ interface RecipesContextType {
   tags: Tag[];
   loading: boolean;
   error: string | null;
+  recipeLoadError: string | null;
+  tagsError: string | null;
   fetchRecipes: () => Promise<void>;
   fetchTags: () => Promise<void>;
   getRecipeById: (id: number) => Promise<Recipe>;
