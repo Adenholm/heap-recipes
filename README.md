@@ -48,6 +48,7 @@ Heap Recipes is developed by [Hanna Adenholm](https://github.com/adenholm) and
 - 📖 View descriptions, preparation time, servings, images, ingredients, and instructions.
 - 🧩 Organize ingredients and instructions into ordered sections.
 - ✏️ Create, edit, and delete recipes and tags.
+- 👥 Let administrators view current users and create accounts.
 - 🖼️ Upload recipe images, served by the API and persisted in Docker.
 - 🔐 Authenticate with JWT tokens and protect recipe-management actions.
 - 🌱 Seed example recipes automatically in the Development environment.

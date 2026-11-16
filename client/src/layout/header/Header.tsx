@@ -4,6 +4,7 @@ import '@/layout/header/Header.css';
 import ramen from '@/assets/images/ramen.svg';
 import login from '@/assets/images/login.svg';
 import account from '@/assets/images/account.svg';
+import group from '@/assets/images/group.svg';
 import addRecipe from '@/assets/images/add-recipe.svg';
 import tagIcon from '@/assets/images/tag.svg';
 import logout from '@/assets/images/logout.svg';
@@ -14,7 +15,7 @@ import { AuthContext } from '@/context/auth';
 
 const Header = () => {
     const { openModal, setModal } = useContext(ModalContext);
-    const { isAuthenticated, onLogout } = useContext(AuthContext);
+    const { isAuthenticated, user, onLogout } = useContext(AuthContext);
     const [menuOpen, setMenuOpen] = useState(false);
 
     const showLoginModal = () => {
@@ -23,15 +24,20 @@ const Header = () => {
         openModal();
     };
 
-    const Menu = ({ onLogout }: { onLogout: () => void }) => {
+    const Menu = ({ onLogout, isAdmin }: { onLogout: () => void; isAdmin: boolean }) => {
     return (
         <nav className='menu'>
             <ul>
+                {isAdmin && <li onClick={() => setMenuOpen(false)}><Link to="/manage-users">
+                <img src={group} alt="Manage Users" className='icon'/>
+                Manage users
+                </Link></li>}
+                {isAdmin && <li className="menu-divider-item"><hr className="menu-divider" /></li>}
                 <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">
                 <img src={tagIcon} alt="Edit Tags" className='icon'/>
                 Edit tags
                 </Link></li>
-                <li><hr className="menu-divider" /></li>
+                <li className="menu-divider-item"><hr className="menu-divider" /></li>
                 <li onClick={onLogout}><img src={logout} alt="Log Out" className='icon'/>Log out</li>
             </ul>
         </nav>
@@ -56,7 +62,7 @@ const Header = () => {
                         <img src={addRecipe} alt="Add Recipe" className='icon'/>
                     </Link>
                     <img src={account} alt="" aria-hidden="true" className='icon' onClick={ () => setMenuOpen(!menuOpen) }/>
-                    { menuOpen && <Menu onLogout={onLogout} /> }
+                    { menuOpen && <Menu onLogout={onLogout} isAdmin={user?.role === 'Admin'} /> }
                 </div>
                 }
         </header>
