@@ -54,7 +54,7 @@ Replace YOUR_USERNAME and A_STRONG_PASSWORD with your PostgreSQL credentials.
 
 ## 4. Default user (optional)
 
-The backend can create a default user on startup. It is only created if both a username and a password are configured, so nothing is seeded unless you set them. The user gets the `Admin` role by default.
+The backend can create a default user on startup when there are no users. It is only created if both a username and a password are configured, so nothing is seeded unless you set them. The user gets the `Admin` role by default. Once a user exists, changing its credentials in the app will not recreate the configured default account.
 
 For local development, store the credentials with [user secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) so they never end up in git. Run this from the `server` folder:
 
@@ -135,6 +135,7 @@ Example request body:
 
 New users registered this way get the `User` role.
 
+Signed-in users can change their username or password from **Account settings** in the header's user menu. Their current password is required. Leave the new password fields empty to change only the username. Existing tokens remain valid until they expire, including after a password change.
 
 # Notes
 

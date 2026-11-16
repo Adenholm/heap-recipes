@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { ModalContext } from '../../context/modal';
 import LoginModal from '../../components/loginModal/Login';
 import { AuthContext } from '../../context/auth';
+import AccountModal from '../../components/accountModal/Account';
 
 const Header = () => {
     const { openModal, setModal } = useContext(ModalContext);
@@ -23,16 +24,23 @@ const Header = () => {
         openModal();
     };
 
+    const showAccountModal = () => {
+        setMenuOpen(false);
+        setModal('Account settings', <AccountModal />);
+        openModal();
+    };
+
     const Menu = ({ onLogout }: { onLogout: () => void }) => {
     return (
         <nav className='menu'>
             <ul>
+                <li><button type="button" onClick={showAccountModal}><img src={account} alt="" className='icon'/>Account settings</button></li>
                 <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">
                 <img src={tagIcon} alt="Edit Tags" className='icon'/>
                 Edit tags
                 </Link></li>
                 <li><hr className="menu-divider" /></li>
-                <li onClick={onLogout}><img src={logout} alt="Log Out" className='icon'/>Log out</li>
+                <li><button type="button" onClick={() => { setMenuOpen(false); onLogout(); }}><img src={logout} alt="" className='icon'/>Log out</button></li>
             </ul>
         </nav>
     );
@@ -55,7 +63,9 @@ const Header = () => {
                     <Link to="/add-recipe">
                         <img src={addRecipe} alt="Add Recipe" className='icon'/>
                     </Link>
-                    <img src={account} alt="" aria-hidden="true" className='icon' onClick={ () => setMenuOpen(!menuOpen) }/>
+                    <button type="button" className="account-menu-button" aria-label="User menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
+                        <img src={account} alt="" className='icon'/>
+                    </button>
                     { menuOpen && <Menu onLogout={onLogout} /> }
                 </div>
                 }
