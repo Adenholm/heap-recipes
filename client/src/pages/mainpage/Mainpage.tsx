@@ -1,10 +1,10 @@
-import './Mainpage.css';
 
-import RecipeCard from '../../components/recipeCard/RecipeCard';
 import { useState } from 'react';
-// @ts-ignore: missing type declaration for SVG import
-import searchIcon from '../../assets/images/search.svg';
-import { useRecipes } from '../../context/recipes';
+import '@/pages/mainpage/Mainpage.css';
+
+import RecipeCard from '@/components/recipeCard/RecipeCard';
+import searchIcon from '@/assets/images/search.svg';
+import { useRecipes } from '@/context/recipes';
 
 const LoadError = ({ resource, message, retrying }: { resource: 'recipes' | 'tags'; message: string; retrying: boolean }) => (
     <div className="load-error" role="alert">

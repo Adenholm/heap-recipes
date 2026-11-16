@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
-import ramenIcon from '../../assets/images/ramen-black.svg';
-import RecipeCard from './RecipeCard';
+import ramenIcon from '@/assets/images/ramen-black.svg';
+import RecipeCard from '@/components/recipeCard/RecipeCard';
 
 const recipe: Recipe = {
     id: 42,

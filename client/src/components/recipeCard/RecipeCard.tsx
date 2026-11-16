@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import './RecipeCard.css';
+import '@/components/recipeCard/RecipeCard.css';
 import { Link } from 'react-router-dom';
-import ramenIcon from '../../assets/images/ramen-black.svg'; //placeholder and fallback image
+import ramenIcon from '@/assets/images/ramen-black.svg'; //placeholder and fallback image
 
 interface RecipeCardProps {
     recipe: Recipe;

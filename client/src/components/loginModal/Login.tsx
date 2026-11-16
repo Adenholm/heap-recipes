@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
-import { ModalContext } from "../../context/modal";
-import { AuthContext } from "../../context/auth";
-import './style.css';
+import { ModalContext } from "@/context/modal";
+import { AuthContext } from "@/context/auth";
+import '@/components/loginModal/style.css';
 
 
 const LoginModal = () => {

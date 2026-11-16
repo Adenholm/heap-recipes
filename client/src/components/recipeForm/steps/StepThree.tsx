@@ -1,4 +1,4 @@
-import InstructionInput from "../InstructionsInput";
+import InstructionInput from "@/components/recipeForm/InstructionsInput";
 
 interface StepThreeProps {
   instructions: Instruction[];

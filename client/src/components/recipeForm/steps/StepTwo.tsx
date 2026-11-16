@@ -1,4 +1,4 @@
-import IngredientInput from "../Ingredientinput";
+import IngredientInput from "@/components/recipeForm/Ingredientinput";
 
 interface StepTwoProps {
   ingredients: Ingredient[];
