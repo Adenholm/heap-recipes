@@ -4,6 +4,7 @@ import './Header.css';
 import ramen from '../../assets/images/ramen.svg';
 import login from '../../assets/images/login.svg';
 import account from '../../assets/images/account.svg';
+import accountDark from '../../assets/images/account-dark.svg';
 import addRecipe from '../../assets/images/add-recipe.svg';
 import tagIcon from '../../assets/images/tag.svg';
 import logout from '../../assets/images/logout.svg';
@@ -31,19 +32,38 @@ const Header = () => {
     };
 
     const Menu = ({ onLogout }: { onLogout: () => void }) => {
-    return (
-        <nav className='menu'>
-            <ul>
-                <li><button type="button" onClick={showAccountModal}><img src={account} alt="" className='icon'/>Account settings</button></li>
-                <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">
-                <img src={tagIcon} alt="Edit Tags" className='icon'/>
-                Edit tags
-                </Link></li>
-                <li><hr className="menu-divider" /></li>
-                <li><button type="button" onClick={() => { setMenuOpen(false); onLogout(); }}><img src={logout} alt="" className='icon'/>Log out</button></li>
-            </ul>
-        </nav>
-    );
+        interface MenuItem {
+            label: string;
+            icon: string;
+            onClick: () => void;
+            to?: string;
+        }
+        const items: MenuItem[] = [
+            { label: 'Edit tags', icon: tagIcon, onClick: () => setMenuOpen(false), to: '/edit-tags' },
+            { label: 'Account settings', icon: accountDark, onClick: showAccountModal },
+            { label: 'Log out', icon: logout, onClick: onLogout }
+        ];
+        return (
+            <nav className="menu" aria-label="User menu">
+                <ul>
+                    {items.map((item, index) => (
+                        <li key={index}>
+                            {item.to ? (
+                                <Link to={item.to} onClick={item.onClick}>
+                                    <img src={item.icon} alt="" className="icon" />
+                                    {item.label}
+                                </Link>
+                            ) : (
+                                <button type="button" onClick={item.onClick}>
+                                    <img src={item.icon} alt="" className="icon" />
+                                    {item.label}
+                                </button>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        );
     };
 
         return (
