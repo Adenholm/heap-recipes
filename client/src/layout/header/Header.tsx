@@ -1,18 +1,18 @@
 import { useContext, useState } from 'react';
-import './Header.css';
+import '@/layout/header/Header.css';
 
-import ramen from '../../assets/images/ramen.svg';
-import login from '../../assets/images/login.svg';
-import account from '../../assets/images/account.svg';
-import accountDark from '../../assets/images/account-dark.svg';
-import addRecipe from '../../assets/images/add-recipe.svg';
-import tagIcon from '../../assets/images/tag.svg';
-import logout from '../../assets/images/logout.svg';
+import ramen from '@/assets/images/ramen.svg';
+import login from '@/assets/images/login.svg';
+import account from '@/assets/images/account.svg';
+import accountDark from '@/assets/images/account-dark.svg';
+import addRecipe from '@/assets/images/add-recipe.svg';
+import tagIcon from '@/assets/images/tag.svg';
+import logout from '@/assets/images/logout.svg';
 import { Link } from 'react-router-dom';
-import { ModalContext } from '../../context/modal';
-import LoginModal from '../../components/loginModal/Login';
-import { AuthContext } from '../../context/auth';
-import AccountModal from '../../components/accountModal/Account';
+import { ModalContext } from '@/context/modal';
+import LoginModal from '@/components/loginModal/Login';
+import { AuthContext } from '@/context/auth';
+import AccountModal from '@/components/accountModal/Account';
 
 const Header = () => {
     const { openModal, setModal } = useContext(ModalContext);

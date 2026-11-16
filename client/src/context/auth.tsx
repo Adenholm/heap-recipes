@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import api from "../service/apiClient";
+import api from "@/service/apiClient";
 import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 

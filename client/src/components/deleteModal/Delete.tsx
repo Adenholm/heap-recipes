@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { ModalContext } from "../../context/modal";
-import { useRecipes } from "../../context/recipes";
+import { ModalContext } from "@/context/modal";
+import { useRecipes } from "@/context/recipes";
 import { useNavigate } from "react-router-dom";
-import './style.css';
+import '@/components/deleteModal/style.css';
 
 const DeleteModal = ({ recipeId }: { recipeId: number }) => {
     const { closeModal } = useContext(ModalContext);
