@@ -1,10 +1,10 @@
 import ReactModal from 'react-modal';
-import { ModalContext } from '../../context/modal.js';
-import './style.css';
+import { ModalContext } from '@/context/modal.js';
+import '@/components/modal/style.css';
 import { useContext } from 'react';
-import style from './style.js';
+import style from '@/components/modal/style.js';
 // @ts-ignore: missing type declaration for SVG import
-import closeIcon from '../../assets/images/close-black.svg';
+import closeIcon from '@/assets/images/close-black.svg';
 
 
 ReactModal.setAppElement('#root');

@@ -1,8 +1,8 @@
 import CreatableSelect from 'react-select/creatable';
 import { MultiValue, ActionMeta } from 'react-select';
-import api from "../../service/apiClient";
+import api from "@/service/apiClient";
 import { useEffect, useState } from 'react';
-import { useRecipes } from '../../context/recipes';
+import { useRecipes } from '@/context/recipes';
 
 type TagOption = { value: string; label: string };
 

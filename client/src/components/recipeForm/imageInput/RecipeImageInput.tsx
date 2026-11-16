@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import api from "../../../service/apiClient";
-import "./style.css";
+import api from "@/service/apiClient";
+import "@/components/recipeForm/imageInput/style.css";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
