@@ -4,6 +4,7 @@ import '@/layout/header/Header.css';
 import ramen from '@/assets/images/ramen.svg';
 import login from '@/assets/images/login.svg';
 import account from '@/assets/images/account.svg';
+import accountDark from '@/assets/images/account-dark.svg';
 import addRecipe from '@/assets/images/add-recipe.svg';
 import tagIcon from '@/assets/images/tag.svg';
 import logout from '@/assets/images/logout.svg';
@@ -11,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { ModalContext } from '@/context/modal';
 import LoginModal from '@/components/loginModal/Login';
 import { AuthContext } from '@/context/auth';
+import AccountModal from '@/components/accountModal/Account';
 
 const Header = () => {
     const { openModal, setModal } = useContext(ModalContext);
@@ -23,19 +25,45 @@ const Header = () => {
         openModal();
     };
 
+    const showAccountModal = () => {
+        setMenuOpen(false);
+        setModal('Account settings', <AccountModal />);
+        openModal();
+    };
+
     const Menu = ({ onLogout }: { onLogout: () => void }) => {
-    return (
-        <nav className='menu'>
-            <ul>
-                <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">
-                <img src={tagIcon} alt="Edit Tags" className='icon'/>
-                Edit tags
-                </Link></li>
-                <li><hr className="menu-divider" /></li>
-                <li onClick={onLogout}><img src={logout} alt="Log Out" className='icon'/>Log out</li>
-            </ul>
-        </nav>
-    );
+        interface MenuItem {
+            label: string;
+            icon: string;
+            onClick: () => void;
+            to?: string;
+        }
+        const items: MenuItem[] = [
+            { label: 'Edit tags', icon: tagIcon, onClick: () => setMenuOpen(false), to: '/edit-tags' },
+            { label: 'Account settings', icon: accountDark, onClick: showAccountModal },
+            { label: 'Log out', icon: logout, onClick: onLogout }
+        ];
+        return (
+            <nav className="menu" aria-label="User menu">
+                <ul>
+                    {items.map((item, index) => (
+                        <li key={index}>
+                            {item.to ? (
+                                <Link to={item.to} onClick={item.onClick}>
+                                    <img src={item.icon} alt="" className="icon" />
+                                    {item.label}
+                                </Link>
+                            ) : (
+                                <button type="button" onClick={item.onClick}>
+                                    <img src={item.icon} alt="" className="icon" />
+                                    {item.label}
+                                </button>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        );
     };
 
         return (
@@ -55,7 +83,9 @@ const Header = () => {
                     <Link to="/add-recipe">
                         <img src={addRecipe} alt="Add Recipe" className='icon'/>
                     </Link>
-                    <img src={account} alt="" aria-hidden="true" className='icon' onClick={ () => setMenuOpen(!menuOpen) }/>
+                    <button type="button" className="account-menu-button" aria-label="User menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
+                        <img src={account} alt="" className='icon'/>
+                    </button>
                     { menuOpen && <Menu onLogout={onLogout} /> }
                 </div>
                 }

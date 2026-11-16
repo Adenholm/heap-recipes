@@ -9,6 +9,7 @@ interface AuthContextType {
   onLogin: (email: string, password: string) => Promise<void>;
   onLogout: () => void;
   onRegister: (email: string, password: string) => Promise<void>;
+  onUpdateAccount: (username: string, currentPassword: string, newPassword: string | null) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>(null!);
@@ -57,12 +58,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await api.post('/auth/register', { email, password });
   };
 
+  const handleUpdateAccount = async (username: string, currentPassword: string, newPassword: string | null) => {
+    const { data } = await api.put<{ token: string }>('/auth/me', { username, currentPassword, newPassword });
+    localStorage.setItem('token', data.token);
+    setToken(data.token);
+  };
+
   const value = {
     token,
     isAuthenticated: !!token,
     onLogin: handleLogin,
     onLogout: handleLogout,
     onRegister: handleRegister,
+    onUpdateAccount: handleUpdateAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
