@@ -1,13 +1,13 @@
-import "./RecipePage.css";
+import "@/pages/recipepage/RecipePage.css";
 
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../context/auth";
-import editIcon from '../../assets/images/edit-white.svg';
-import deleteIcon from '../../assets/images/delete-white.svg';
-import { useRecipes } from "../../context/recipes";
-import { ModalContext } from "../../context/modal";
-import DeleteModal from "../../components/deleteModal/Delete";
+import { AuthContext } from "@/context/auth";
+import editIcon from '@/assets/images/edit-white.svg';
+import deleteIcon from '@/assets/images/delete-white.svg';
+import { useRecipes } from "@/context/recipes";
+import { ModalContext } from "@/context/modal";
+import DeleteModal from "@/components/deleteModal/Delete";
 import placeHolderImage from '@/assets/images/ramen-black.svg'
 
 

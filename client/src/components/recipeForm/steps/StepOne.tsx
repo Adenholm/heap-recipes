@@ -1,6 +1,6 @@
-import TagInput from "../Taginput";
-import RecipeImageInput from "../imageInput/RecipeImageInput";
-import "../style.css";
+import TagInput from "@/components/recipeForm/Taginput";
+import RecipeImageInput from "@/components/recipeForm/imageInput/RecipeImageInput";
+import "@/components/recipeForm/style.css";
 
 interface StepOneProps {
     recipe: Recipe;

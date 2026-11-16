@@ -1,9 +1,9 @@
 import { use, useEffect, useState } from "react";
-import api from "../../service/apiClient";
-import './style.css';
+import api from "@/service/apiClient";
+import '@/pages/editTagspage/style.css';
 // @ts-ignore: missing type declaration for SVG import
-import deleteIcon from '../../assets/images/delete-white.svg';
-import { useRecipes } from "../../context/recipes";
+import deleteIcon from '@/assets/images/delete-white.svg';
+import { useRecipes } from "@/context/recipes";
 
 
 const EditTagsPage = () => {

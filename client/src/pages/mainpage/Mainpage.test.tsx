@@ -2,11 +2,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
-import Mainpage from './Mainpage';
+import Mainpage from '@/pages/mainpage/Mainpage';
 
 const useRecipesMock = vi.hoisted(() => vi.fn());
 
-vi.mock('../../context/recipes', () => ({
+vi.mock('@/context/recipes', () => ({
     useRecipes: useRecipesMock,
 }));
 

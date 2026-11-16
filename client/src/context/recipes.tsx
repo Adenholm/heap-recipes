@@ -1,5 +1,5 @@
 import React from "react";
-import api from "../service/apiClient";
+import api from "@/service/apiClient";
 
 const RecipesContext = React.createContext<RecipesContextType | undefined>(undefined);
 

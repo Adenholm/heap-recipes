@@ -1,12 +1,12 @@
-import recipesRaw from '../../data/recipes.json';
-import './Mainpage.css';
+import recipesRaw from '@/data/recipes.json';
+import '@/pages/mainpage/Mainpage.css';
 
-import RecipeCard from '../../components/recipeCard/RecipeCard';
+import RecipeCard from '@/components/recipeCard/RecipeCard';
 import { useEffect, useState } from 'react';
-import api from '../../service/apiClient';
+import api from '@/service/apiClient';
 // @ts-ignore: missing type declaration for SVG import
-import searchIcon from '../../assets/images/search.svg';
-import { useRecipes } from '../../context/recipes';
+import searchIcon from '@/assets/images/search.svg';
+import { useRecipes } from '@/context/recipes';
 
 const Mainpage = () => {
     const { recipes, tags, loading, error } = useRecipes();

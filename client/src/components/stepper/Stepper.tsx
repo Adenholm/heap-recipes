@@ -1,6 +1,6 @@
 
-import Steps from './Steps';
-import './style.css';
+import Steps from '@/components/stepper/Steps';
+import '@/components/stepper/style.css';
 import { useState } from 'react';
 
 interface StepperProps {
