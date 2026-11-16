@@ -86,7 +86,7 @@ describe('Mainpage', () => {
         expect(screen.getByText('No recipes found.')).toBeVisible();
 
         useRecipesMock.mockReturnValue({
-            recipes,
+            recipes: [],
             tags: [],
             loading: false,
             error: 'Unable to load recipes',
@@ -96,7 +96,8 @@ describe('Mainpage', () => {
                 <Mainpage />
             </BrowserRouter>,
         );
-        expect(screen.getByText('Error loading recipes: Unable to load recipes')).toBeVisible();
+        expect(screen.getByRole('alert')).toHaveTextContent("Couldn't load recipes");
+        expect(screen.getByRole('alert')).toHaveTextContent('Details: Unable to load recipes');
     });
 
     it('shows all matching recipes again when a selected tag is toggled off', async () => {

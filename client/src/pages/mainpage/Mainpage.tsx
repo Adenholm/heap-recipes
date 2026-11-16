@@ -1,57 +1,48 @@
-import recipesRaw from '../../data/recipes.json';
 import './Mainpage.css';
 
 import RecipeCard from '../../components/recipeCard/RecipeCard';
-import { useEffect, useState } from 'react';
-import api from '../../service/apiClient';
+import { useState } from 'react';
 // @ts-ignore: missing type declaration for SVG import
 import searchIcon from '../../assets/images/search.svg';
 import { useRecipes } from '../../context/recipes';
 
+const LoadError = ({ resource, message, retrying }: { resource: 'recipes' | 'tags'; message: string; retrying: boolean }) => (
+    <div className="load-error" role="alert">
+        <p className="load-error-title">Couldn't load {resource}</p>
+        <p>Check your connection or try again later.{retrying && " We'll keep trying automatically."}</p>
+        <p className="load-error-detail">Details: {message}</p>
+    </div>
+);
+
 const Mainpage = () => {
-    const { recipes, tags, loading, error } = useRecipes();
-    const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
+    const { recipes, tags, loading, error, recipeLoadError, tagsError } = useRecipes();
     const [search, setSearch] = useState<string>('');
     const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
-    useEffect(() => {
-        setFilteredRecipes(recipes);
-    }, [recipes]);
+    const filteredRecipes = recipes.filter(recipe =>
+        recipe.title.toLowerCase().includes(search.toLowerCase()) &&
+        selectedTags.every(tag => recipe.tags.some(recipeTag => recipeTag.id === tag.id))
+    );
 
     const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
-        setFilteredRecipes(
-            recipes.filter(recipe =>
-                recipe.title.toLowerCase().includes(value.toLowerCase())
-            )
-        );
     };
 
     const onTagSelect = (tag: Tag) => {
         let updatedSelectedTags: Tag[];
-        if (selectedTags.includes(tag)) {
+        if (selectedTags.some(selectedTag => selectedTag.id === tag.id)) {
             updatedSelectedTags = selectedTags.filter(t => t.id !== tag.id);
         } else {
             updatedSelectedTags = [...selectedTags, tag];
         }
-        setSelectedTags(updatedSelectedTags);  
-        if (updatedSelectedTags.length === 0) {
-            setFilteredRecipes(recipes.filter(recipe =>
-                recipe.title.toLowerCase().includes(search.toLowerCase())
-            ));
-        } else {
-            setFilteredRecipes(recipes.filter(recipe =>
-                updatedSelectedTags.every(t => recipe.tags.some(rt => rt.id === t.id)) &&
-                recipe.title.toLowerCase().includes(search.toLowerCase())
-            ));
-        }
+        setSelectedTags(updatedSelectedTags);
     };
 
     const MainContent = () => {
-        if (loading) return <p className='no-recipes-text'>Loading recipes...</p>;
+        if (error) return <LoadError resource="recipes" message={error} retrying={!!recipeLoadError} />;
+        else if (loading) return <p className='no-recipes-text'>Loading recipes...</p>;
         else if (recipes.length === 0) return <p className='no-recipes-text'>No recipes found.</p>;
-        else if (error)  return <p className='no-recipes-text'>Error loading recipes: {error}</p>;
         else return (            
             <ul className='recipe-list'>
                 {filteredRecipes.map((recipe: Recipe) => (
@@ -79,7 +70,7 @@ const Mainpage = () => {
                 {tags.map(tag => (
                     <button
                         key={tag.id}
-                        className={`tag ${selectedTags.includes(tag) ? 'selected' : ''}`}
+                        className={`tag ${selectedTags.some(selectedTag => selectedTag.id === tag.id) ? 'selected' : ''}`}
                         onClick={() => { onTagSelect(tag); }}
                     >
                         {tag.name}
@@ -87,6 +78,7 @@ const Mainpage = () => {
                 ))}
             </div>
 
+            {tagsError && !recipeLoadError && <LoadError resource="tags" message={tagsError} retrying />}
             <MainContent />
         </>
     );
