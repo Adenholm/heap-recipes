@@ -8,6 +8,7 @@ vi.mock('@/service/apiClient', () => ({
     default: {
         get: vi.fn(),
         post: vi.fn(),
+        delete: vi.fn(),
     },
 }));
 
@@ -44,6 +45,20 @@ describe('UserManagementPage', () => {
         });
         expect(await screen.findByRole('status')).toHaveTextContent('User added successfully.');
         expect(apiMock.get).toHaveBeenCalledWith('/auth/users');
+    });
+
+    it('deletes a user after confirmation', async () => {
+        const user = userEvent.setup();
+        render(<UserManagementPage />);
+
+        await user.click(await screen.findByRole('button', { name: 'Delete admin' }));
+        const dialog = await screen.findByRole('dialog');
+        await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+
+        await waitFor(() => {
+            expect(apiMock.delete).toHaveBeenCalledWith('/auth/users/1');
+        });
+        expect(await screen.findByRole('status')).toHaveTextContent('User admin deleted.');
     });
 
     it('shows an error when the user list cannot be loaded', async () => {

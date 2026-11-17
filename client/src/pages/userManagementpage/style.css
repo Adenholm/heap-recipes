@@ -83,3 +83,27 @@
 .user-management-success {
     color: var(--color-green);
 }
+
+.user-actions {
+    text-align: right;
+}
+
+.user-management .delete-user-button {
+    background-color: var(--color-rederror);
+    padding: 0.25rem 0.5rem;
+}
+
+.delete-user-button img {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}

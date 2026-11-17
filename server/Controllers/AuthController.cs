@@ -56,6 +56,22 @@ public class AuthController : ControllerBase
         return Ok(users);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("users/{id:int}")]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        if (User.FindFirstValue(ClaimTypes.NameIdentifier) == id.ToString())
+            return BadRequest("You cannot delete your own account");
+
+        var user = await _db.Users.FindAsync(id);
+        if (user == null)
+            return NotFound();
+
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {

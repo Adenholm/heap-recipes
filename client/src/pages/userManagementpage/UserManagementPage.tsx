@@ -1,12 +1,16 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useContext, useEffect, useState } from 'react';
 import { isAxiosError } from 'axios';
 import ReactModal from 'react-modal';
 import api from '@/service/apiClient';
+import { AuthContext } from '@/context/auth';
 import modalStyle from '@/components/modal/style.js';
 import '@/components/modal/style.css';
+import '@/components/deleteModal/style.css';
 import '@/pages/userManagementpage/style.css';
 // @ts-ignore: missing type declaration for SVG import
 import closeIcon from '@/assets/images/close-black.svg';
+// @ts-ignore: missing type declaration for SVG import
+import deleteIcon from '@/assets/images/delete-white.svg';
 
 interface ManagedUser {
     id: number;
@@ -15,6 +19,10 @@ interface ManagedUser {
 }
 
 const UserManagementPage = () => {
+    const currentUserId = useContext(AuthContext)?.user?.id;
+    const [userToDelete, setUserToDelete] = useState<ManagedUser | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
     const [users, setUsers] = useState<ManagedUser[]>([]);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -77,6 +85,30 @@ const UserManagementPage = () => {
         }
     };
 
+    const closeDeleteModal = () => {
+        setUserToDelete(null);
+        setDeleteError('');
+    };
+
+    const handleDelete = async () => {
+        if (!userToDelete) return;
+        setIsDeleting(true);
+        setDeleteError('');
+        try {
+            await api.delete(`/auth/users/${userToDelete.id}`);
+            setSuccess(`User ${userToDelete.username} deleted.`);
+            setUserToDelete(null);
+            await loadUsers();
+        } catch (requestError) {
+            const message = isAxiosError(requestError) && typeof requestError.response?.data === 'string'
+                ? requestError.response.data
+                : 'Unable to delete user. Please try again.';
+            setDeleteError(message);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <main className="user-management container">
             <div className="user-management-header">
@@ -102,6 +134,7 @@ const UserManagementPage = () => {
                                 <tr>
                                     <th scope="col">Username</th>
                                     <th scope="col">Role</th>
+                                    <th scope="col"><span className="visually-hidden">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,6 +142,18 @@ const UserManagementPage = () => {
                                     <tr key={user.id}>
                                         <td>{user.username}</td>
                                         <td>{user.role ?? 'User'}</td>
+                                        <td className="user-actions">
+                                            {user.id !== currentUserId && (
+                                                <button
+                                                    type="button"
+                                                    className="delete-user-button"
+                                                    aria-label={`Delete ${user.username}`}
+                                                    onClick={() => { setSuccess(''); setUserToDelete(user); }}
+                                                >
+                                                    <img src={deleteIcon} alt="" />
+                                                </button>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -167,6 +212,30 @@ const UserManagementPage = () => {
                             {isSubmitting ? 'Adding user...' : 'Add user'}
                         </button>
                     </form>
+                </div>
+            </ReactModal>
+            <ReactModal
+                isOpen={userToDelete !== null}
+                onRequestClose={closeDeleteModal}
+                style={modalStyle}
+                appElement={document.getElementById('root') ?? undefined}
+                ariaHideApp={!!document.getElementById('root')}
+            >
+                <div className="modal-body">
+                    <section className="modal-header border-bottom">
+                        <h2>Delete user</h2>
+                        <button type="button" className="modal-close" onClick={closeDeleteModal} aria-label="Close modal">
+                            <img src={closeIcon} alt="" />
+                        </button>
+                    </section>
+                    <p>Are you sure you want to delete {userToDelete?.username}?</p>
+                    {deleteError && <p className="user-management-error" role="alert">{deleteError}</p>}
+                    <div className="modal-buttons">
+                        <button type="button" onClick={closeDeleteModal}>Cancel</button>
+                        <button type="button" onClick={handleDelete} disabled={isDeleting}>
+                            {isDeleting ? 'Deleting...' : 'Delete'}
+                        </button>
+                    </div>
                 </div>
             </ReactModal>
         </main>
