@@ -248,6 +248,7 @@ the `postgres_data` volume and uploaded images in `recipe_uploads`.
 | `Jwt__ExpireMinutes` | Token lifetime in minutes |
 | `AllowedOrigins` | Semicolon-separated allowed origins |
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL initialization |
+| `Swagger:Enabled` | Enable or disable Swagger UI, note that swagger is always enabled in Development |
 
 </details>
 
