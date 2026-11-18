@@ -8,6 +8,11 @@ export default defineConfig({
     server: {
         port: 3000,
         proxy: {
+            '/api/swagger': {
+                target: 'http://localhost:5036',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/swagger/, '/swagger')
+            },
             '/api': {
                 target: 'http://localhost:5036',
                 changeOrigin: true,
@@ -18,6 +23,7 @@ export default defineConfig({
                 changeOrigin: true,
                 secure: false,
             },
+
         },
     },
     plugins: [
