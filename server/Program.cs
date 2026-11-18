@@ -9,11 +9,25 @@ using Microsoft.Extensions.FileProviders;
 using HeapRecipeApi.Services;
 using System.Reflection;
 using HeapRecipeApi.Swagger;
+using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure EF Core with PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var postgres = builder.Configuration.GetSection("Postgres");
+if (postgres.Exists())
+{
+    var postgresConnection = new NpgsqlConnectionStringBuilder(connectionString)
+    {
+        Database = postgres["Database"] ?? throw new InvalidOperationException("Postgres:Database is required."),
+        Username = postgres["Username"] ?? throw new InvalidOperationException("Postgres:Username is required."),
+        Password = postgres["Password"] ?? throw new InvalidOperationException("Postgres:Password is required.")
+    };
+    connectionString = postgresConnection.ConnectionString;
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
-    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opts.UseNpgsql(connectionString));
 builder.Services.AddSingleton<ImageStorage>();
 builder.Services.AddHostedService<OrphanImageCleaner>();
 
@@ -126,7 +140,7 @@ if (swaggerEnabled)
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Recipe API v1");
+        c.SwaggerEndpoint("./v1/swagger.json", "Recipe API v1");
         c.EnablePersistAuthorization();
         c.DisplayRequestDuration();
         c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);

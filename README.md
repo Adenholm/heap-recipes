@@ -218,7 +218,7 @@ npm run dev
 | --- | --- |
 | Frontend | <http://localhost:3000> |
 | API | <http://localhost:5036> (HTTPS: <https://localhost:7153>) |
-| Swagger | `/swagger` while the API runs in Development |
+| Swagger | <http://localhost:3000/api/swagger> (or <http://localhost:5036/swagger> directly) |
 
 ---
 
@@ -231,8 +231,15 @@ docker compose up --build
 ```
 
 The frontend is available at <http://localhost:3000>. Nginx serves the frontend
-and proxies `/api/` and `/uploads/` to the backend. PostgreSQL data is stored in
+and proxies `/api/` and `/uploads/` to the backend. Swagger is available at
+<http://localhost:3000/api/swagger> by default, including in Production. Set
+`Swagger__Enabled=false` to disable it outside Development; when enabled, the
+API documentation and UI are publicly accessible. PostgreSQL data is stored in
 the `postgres_data` volume and uploaded images in `recipe_uploads`.
+Compose uses `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` for both
+the database and the API connection. For existing installations, ensure these
+values match the initialized database; changing them does not update an
+existing PostgreSQL volume.
 
 <details>
 <summary>Environment variables expected by the Compose backend</summary>
@@ -242,13 +249,12 @@ the `postgres_data` volume and uploaded images in `recipe_uploads`.
 | Variable | Purpose |
 | --- | --- |
 | `ASPNETCORE_ENVIRONMENT` | API environment, normally `Production` |
-| `ConnectionStrings__DefaultConnection` | PostgreSQL connection string |
 | `JWT__Key` | JWT signing key, at least 32 characters |
 | `Jwt__Issuer` / `Jwt__Audience` | JWT validation values |
 | `Jwt__ExpireMinutes` | Token lifetime in minutes |
 | `AllowedOrigins` | Semicolon-separated allowed origins |
-| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL initialization |
-| `Swagger:Enabled` | Enable or disable Swagger UI, note that swagger is always enabled in Development |
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL initialization and API connection |
+| `Swagger__Enabled` | Enable Swagger outside Development (defaults to `true` in Compose) |
 
 </details>
 
@@ -257,7 +263,8 @@ the `postgres_data` volume and uploaded images in `recipe_uploads`.
 ## API
 
 The API is rooted at `/api`. Interactive documentation is available at
-`/swagger` in Development.
+`/api/swagger` through the frontend proxy, or `/swagger` directly on the API
+when Swagger is enabled.
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
