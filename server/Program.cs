@@ -7,11 +7,27 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
 using HeapRecipeApi.Services;
+using System.Reflection;
+using HeapRecipeApi.Swagger;
+using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure EF Core with PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var postgres = builder.Configuration.GetSection("Postgres");
+if (postgres.Exists())
+{
+    var postgresConnection = new NpgsqlConnectionStringBuilder(connectionString)
+    {
+        Database = postgres["Database"] ?? throw new InvalidOperationException("Postgres:Database is required."),
+        Username = postgres["Username"] ?? throw new InvalidOperationException("Postgres:Username is required."),
+        Password = postgres["Password"] ?? throw new InvalidOperationException("Postgres:Password is required.")
+    };
+    connectionString = postgresConnection.ConnectionString;
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
-    opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opts.UseNpgsql(connectionString));
 builder.Services.AddSingleton<ImageStorage>();
 builder.Services.AddHostedService<OrphanImageCleaner>();
 
@@ -67,8 +83,32 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Recipe API", Version = "v1" });
-    var securityScheme = new OpenApiSecurityScheme
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Heap Recipes API",
+        Version = "1.0.0",
+        Description = """
+            API for managing recipes, users and image uploads in Heap Recipes.
+
+            ### Features
+            - Authentication via JWT
+            - Recipe management
+            - Image upload and processing
+            - System health endpoint
+
+            ### Environments
+            - Local development (proxy)
+            - Local direct
+            - Production API
+            """,
+        Contact = new OpenApiContact
+        {
+            Name = "Hanna Adenholm",
+            Url = new Uri("https://adenholm.com"),
+        }
+    });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
@@ -76,13 +116,11 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
         Description = "JWT Authorization header using the Bearer scheme."
-    };
-    c.AddSecurityDefinition("Bearer", securityScheme);
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { securityScheme, new string[] { } }
     });
+
+    c.OperationFilter<AuthorizeOperationFilter>();
 });
+
 
 var app = builder.Build();
 
@@ -93,10 +131,20 @@ var uploadPath = Path.IsPathRooted(configuredUploadPath ?? string.Empty)
 
 Directory.CreateDirectory(uploadPath);
 
-if (app.Environment.IsDevelopment())
+
+var swaggerEnabled = app.Environment.IsDevelopment()
+    || app.Configuration.GetValue<bool>("Swagger:Enabled");
+
+if (swaggerEnabled)
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("./v1/swagger.json", "Recipe API v1");
+        c.EnablePersistAuthorization();
+        c.DisplayRequestDuration();
+        c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+    });
 }
 
 using (var scope = app.Services.CreateScope())

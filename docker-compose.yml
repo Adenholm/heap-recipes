@@ -21,6 +21,7 @@ services:
       - Jwt__Audience=${Jwt__Audience}
       - Jwt__ExpireMinutes=${Jwt__ExpireMinutes}
       - AllowedOrigins=${AllowedOrigins}
+      - Swagger__Enabled=${Swagger__Enabled:-true}
       - UploadPath=/app/uploads
     volumes:
       - recipe_uploads:/app/uploads

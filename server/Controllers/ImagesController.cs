@@ -20,9 +20,9 @@ public class ImagesController : ControllerBase
 
     [Authorize]
     [HttpPost]
+    [Consumes("multipart/form-data")]
     [RequestSizeLimit(MaxUploadSize)]
-    public async Task<IActionResult> Upload([FromForm] IFormFile file)
-    {
+    public async Task<IActionResult> Upload(IFormFile file)    {
         if (file is null || file.Length == 0)
             return BadRequest("Ingen fil skickades");
 
