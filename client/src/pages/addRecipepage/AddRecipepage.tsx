@@ -117,6 +117,7 @@ const AddRecipePage = () => {
                         setImageUrl={(imageUrl) => setRecipe((current) => ({ ...current, imageUrl }))}
                         tags={tags}
                         setTags={setTags}
+                        onRecipeSelect={(id) => navigate(`/edit-recipe/${id}`)}
                     />
                     <StepTwo
                         ingredients={ingredients}

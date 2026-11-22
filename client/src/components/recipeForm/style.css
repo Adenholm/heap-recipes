@@ -5,6 +5,58 @@
     gap: 1rem;
 }
 
+.title-suggestions {
+    position: relative;
+    width: 400px;
+    max-width: 90%;
+}
+
+.recipe-form .title-suggestions input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.title-suggestions-list {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    max-height: 12rem;
+    overflow-y: auto;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 0 0 4px 4px;
+}
+
+.title-suggestions-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem;
+    cursor: pointer;
+}
+
+.title-suggestions-list li > span:first-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.title-suggestions-list li:hover,
+.title-suggestions-list li[aria-selected="true"] {
+    background: #e6ebda;
+}
+
+.title-suggestions-list li::after {
+  content: "exists";
+  font-size: 0.8rem;
+  color: #888;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .two-input-row {
     display: flex;
     gap: 1rem;
