@@ -10,22 +10,21 @@ interface StepOneProps {
     setImageUrl: (imageUrl: string) => void;
     tags: { value: string; label: string }[];
     setTags: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
-    onTitleSelect?: (title: string) => void;
+    onRecipeSelect?: (id: number) => void;
 }
 
-const StepOne = ({ recipe, handleChange, setImageUrl, tags, setTags, onTitleSelect }: StepOneProps) => {
+const StepOne = ({ recipe, handleChange, setImageUrl, tags, setTags, onRecipeSelect }: StepOneProps) => {
     const { recipes, recipeLoadError } = useRecipes();
     const suggestionsId = useId();
     const [suggestionsOpen, setSuggestionsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
     const search = recipe.title.trim().toLowerCase();
-    const matchingTitles = search
-        ? [...new Set(recipes.filter(({ title }) => title.toLowerCase().includes(search)).map(({ title }) => title))]
-        : [];
-    const showSuggestions = !!onTitleSelect && suggestionsOpen && matchingTitles.length > 0;
+    const matches = search ? recipes.filter(({ title }) => title.toLowerCase().includes(search)) : [];
+    const matchingRecipes = matches.filter((match): match is Recipe & { id: number } => typeof match.id === "number");
+    const showSuggestions = !!onRecipeSelect && suggestionsOpen && matchingRecipes.length > 0;
 
-    const selectTitle = (title: string) => {
-        onTitleSelect?.(title);
+    const selectRecipe = (id: number) => {
+        onRecipeSelect?.(id);
         setSuggestionsOpen(false);
         setActiveIndex(-1);
     };
@@ -48,47 +47,55 @@ const StepOne = ({ recipe, handleChange, setImageUrl, tags, setTags, onTitleSele
                         onFocus={() => setSuggestionsOpen(true)}
                         onBlur={() => setSuggestionsOpen(false)}
                         onKeyDown={event => {
-                            if (!onTitleSelect) return;
+                            if (!onRecipeSelect) return;
                             if (event.key === "Escape") {
                                 setSuggestionsOpen(false);
                                 setActiveIndex(-1);
-                            } else if (matchingTitles.length > 0 && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+                            } else if (matchingRecipes.length > 0 && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
                                 event.preventDefault();
                                 setSuggestionsOpen(true);
                                 setActiveIndex(current => event.key === "ArrowDown"
-                                    ? Math.min(current + 1, matchingTitles.length - 1)
-                                    : current <= 0 ? matchingTitles.length - 1 : current - 1);
-                            } else if (event.key === "Enter" && showSuggestions && activeIndex >= 0 && activeIndex < matchingTitles.length) {
+                                    ? Math.min(current + 1, matchingRecipes.length - 1)
+                                    : current <= 0 ? matchingRecipes.length - 1 : current - 1);
+                            } else if (event.key === "Enter" && showSuggestions && activeIndex >= 0 && activeIndex < matchingRecipes.length) {
                                 event.preventDefault();
-                                selectTitle(matchingTitles[activeIndex]);
+                                selectRecipe(matchingRecipes[activeIndex].id);
                             }
                         }}
-                        role={onTitleSelect ? "combobox" : undefined}
-                        aria-autocomplete={onTitleSelect ? "list" : undefined}
-                        aria-expanded={onTitleSelect ? showSuggestions : undefined}
-                        aria-controls={onTitleSelect ? suggestionsId : undefined}
-                        aria-activedescendant={showSuggestions && activeIndex >= 0 && activeIndex < matchingTitles.length ? `${suggestionsId}-${activeIndex}` : undefined}
+                        role={onRecipeSelect ? "combobox" : undefined}
+                        aria-autocomplete={onRecipeSelect ? "list" : undefined}
+                        aria-expanded={onRecipeSelect ? showSuggestions : undefined}
+                        aria-controls={onRecipeSelect ? suggestionsId : undefined}
+                        aria-activedescendant={showSuggestions && activeIndex >= 0 && activeIndex < matchingRecipes.length ? `${suggestionsId}-${activeIndex}` : undefined}
                         required
                     />
                     {showSuggestions && (
                         <ul id={suggestionsId} role="listbox" className="title-suggestions-list">
-                            {matchingTitles.map((title, index) => (
-                                <li
-                                    id={`${suggestionsId}-${index}`}
-                                    key={title}
-                                    role="option"
-                                    aria-selected={index === activeIndex}
-                                    aria-label={title}
-                                    onMouseDown={event => event.preventDefault()}
-                                    onClick={() => selectTitle(title)}
-                                >
-                                    <span>{title}</span>
-                                </li>
-                            ))}
+                            {matchingRecipes.map((match, index) => {
+                                const label = matchingRecipes.some(other => other.id !== match.id && other.title === match.title)
+                                    ? `${match.title} (ID ${match.id})`
+                                    : match.title;
+                                return (
+                                    <li
+                                        id={`${suggestionsId}-${index}`}
+                                        key={match.id}
+                                        role="option"
+                                        aria-selected={index === activeIndex}
+                                        aria-label={label}
+                                        onMouseDown={event => event.preventDefault()}
+                                        onClick={() => selectRecipe(match.id)}
+                                    >
+                                        <span>{label}</span>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     )}
                 </div>
-                {onTitleSelect && recipeLoadError && <p role="alert">Couldn't load recipe suggestions. We'll keep trying automatically.</p>}
+                {onRecipeSelect && recipeLoadError && <p role="alert">Couldn't load recipe suggestions. We'll keep trying automatically.</p>}
+                {onRecipeSelect && suggestionsOpen && matches.length !== matchingRecipes.length && (
+                    <p role="alert">Some recipe suggestions couldn't be shown because they are missing an ID.</p>
+                )}
             </div>
             <div>
                 <label htmlFor="description">Description:</label>
