@@ -4,6 +4,7 @@ import '@/layout/header/Header.css';
 import ramen from '@/assets/images/ramen.svg';
 import login from '@/assets/images/login.svg';
 import account from '@/assets/images/account.svg';
+import group from '@/assets/images/group.svg';
 import accountDark from '@/assets/images/account-dark.svg';
 import addRecipe from '@/assets/images/add-recipe.svg';
 import tagIcon from '@/assets/images/tag.svg';
@@ -16,7 +17,7 @@ import AccountModal from '@/components/accountModal/Account';
 
 const Header = () => {
     const { openModal, setModal } = useContext(ModalContext);
-    const { isAuthenticated, onLogout } = useContext(AuthContext);
+    const { isAuthenticated, user, onLogout } = useContext(AuthContext);
     const [menuOpen, setMenuOpen] = useState(false);
 
     const showLoginModal = () => {
@@ -31,7 +32,7 @@ const Header = () => {
         openModal();
     };
 
-    const Menu = ({ onLogout }: { onLogout: () => void }) => {
+    const Menu = ({ onLogout, isAdmin }: { onLogout: () => void; isAdmin: boolean }) => {
         interface MenuItem {
             label: string;
             icon: string;
@@ -39,9 +40,10 @@ const Header = () => {
             to?: string;
         }
         const items: MenuItem[] = [
-            { label: 'Edit tags', icon: tagIcon, onClick: () => setMenuOpen(false), to: '/edit-tags' },
             { label: 'Account settings', icon: accountDark, onClick: showAccountModal },
-            { label: 'Log out', icon: logout, onClick: onLogout }
+            ...(isAdmin ? [{ label: 'Manage users', icon: group, onClick: () => setMenuOpen(false), to: '/manage-users' }] : []),
+            { label: 'Edit tags', icon: tagIcon, onClick: () => setMenuOpen(false), to: '/edit-tags' },
+            { label: 'Log out', icon: logout, onClick: onLogout },
         ];
         return (
             <nav className="menu" aria-label="User menu">
@@ -86,7 +88,7 @@ const Header = () => {
                     <button type="button" className="account-menu-button" aria-label="User menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
                         <img src={account} alt="" className='icon'/>
                     </button>
-                    { menuOpen && <Menu onLogout={onLogout} /> }
+                    { menuOpen && <Menu onLogout={onLogout} isAdmin={user?.role === 'Admin'} /> }
                 </div>
                 }
         </header>

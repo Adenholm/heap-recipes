@@ -1,10 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { isAxiosError } from "axios";
 import api from "@/service/apiClient";
 import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 interface AuthContextType {
   token: string | null;
+  user: AuthUser | null;
+  isLoading: boolean;
   isAuthenticated: boolean;
   onLogin: (email: string, password: string) => Promise<void>;
   onLogout: () => void;
@@ -12,25 +15,43 @@ interface AuthContextType {
   onUpdateAccount: (username: string, currentPassword: string, newPassword: string | null) => Promise<void>;
 }
 
+export interface AuthUser {
+  id: number;
+  username: string;
+  role: string | null;
+}
+
 export const AuthContext = createContext<AuthContextType>(null!);
 
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initializeAuth = async() => {
       const storedToken = localStorage.getItem('token');
-      if (!storedToken) return;
-
-      const reponse = await api.get('/auth/me'); // Validate token on load
-      if (reponse.status !== 200) {
-        localStorage.removeItem('token');
+      if (!storedToken) {
+        setIsLoading(false);
         return;
       }
 
-      setToken(storedToken);
-      api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+      try {
+        const response = await api.get<AuthUser>('/auth/me', {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        });
+        setToken(storedToken);
+        setUser(response.data);
+      } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 401) {
+          localStorage.removeItem('token');
+        } else {
+          console.error('Unable to restore authentication session', error);
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
     initializeAuth();
   }, []);
@@ -45,13 +66,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const handleLogin = async (username: string, password: string): Promise<void> => {
     const { data } = await api.post('/auth/login', { username, password });
+    const userResponse = await api.get<AuthUser>('/auth/me', {
+      headers: { Authorization: `Bearer ${data.token}` },
+    });
     localStorage.setItem('token', data.token);
     setToken(data.token);
+    setUser(userResponse.data);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);
+    setUser(null);
   };
 
   const handleRegister = async (email: string, password: string) => {
@@ -66,6 +92,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     token,
+    user,
+    isLoading,
     isAuthenticated: !!token,
     onLogin: handleLogin,
     onLogout: handleLogout,
@@ -88,8 +116,35 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     throw new Error('ProtectedRoute must be used within an AuthProvider');
   }
 
+  if (auth.isLoading) {
+    return null;
+  }
+
   if (!auth.isAuthenticated) {
     return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  return <>{children}</>;
+}
+
+export function AdminRoute({ children }: ProtectedRouteProps) {
+  const auth = useContext(AuthContext);
+  const location = useLocation();
+
+  if (!auth) {
+    throw new Error('AdminRoute must be used within an AuthProvider');
+  }
+
+  if (auth.isLoading) {
+    return null;
+  }
+
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  if (auth.user?.role !== 'Admin') {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

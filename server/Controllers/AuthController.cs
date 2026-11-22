@@ -21,10 +21,14 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
+        var role = string.IsNullOrWhiteSpace(dto.Role) ? "User" : dto.Role;
+        if (role != "User" && role != "Admin")
+            return BadRequest("Role must be 'User' or 'Admin'");
+
         if (await _db.Users.AnyAsync(u => u.Username == dto.Username))
             return BadRequest("Username already taken");
 
@@ -32,12 +36,41 @@ public class AuthController : ControllerBase
         {
             Username = dto.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = "User"
+            Role = role
         };
 
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
-        return Ok(new { user.Id, user.Username });
+        return Ok(new { user.Id, user.Username, user.Role });
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("users")]
+    public async Task<IActionResult> Users()
+    {
+        var users = await _db.Users
+            .OrderByDescending(user => user.Role == "Admin")
+            .ThenBy(user => user.Username)
+            .Select(user => new { user.Id, user.Username, user.Role })
+            .ToListAsync();
+
+        return Ok(users);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("users/{id:int}")]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        if (User.FindFirstValue(ClaimTypes.NameIdentifier) == id.ToString())
+            return BadRequest("You cannot delete your own account");
+
+        var user = await _db.Users.FindAsync(id);
+        if (user == null)
+            return NotFound();
+
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 
     [HttpPost("login")]
@@ -108,6 +141,6 @@ public class AuthController : ControllerBase
     }
 }
 
-public record RegisterDto(string Username, string Password);
+public record RegisterDto(string Username, string Password, string? Role = null);
 public record LoginDto(string Username, string Password);
 public record UpdateAccountDto(string? Username, string? CurrentPassword, string? NewPassword);

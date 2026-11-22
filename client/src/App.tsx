@@ -9,8 +9,9 @@ import Footer from '@/layout/footer/Footer'
 import Modal from '@/components/modal/modal'
 import AddRecipePage from '@/pages/addRecipepage/AddRecipepage'
 import EditRecipePage from '@/pages/editRecipepage/EditRecipePage'
-import { ProtectedRoute } from '@/context/auth'
+import { AdminRoute, ProtectedRoute } from '@/context/auth'
 import EditTagsPage from '@/pages/editTagspage/EditTagspage'
+import UserManagementPage from '@/pages/userManagementpage/UserManagementPage'
 
 function App() {
 
@@ -43,6 +44,14 @@ function App() {
                         <ProtectedRoute>
                             <EditTagsPage />
                         </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path='/manage-users'
+                    element={
+                        <AdminRoute>
+                            <UserManagementPage />
+                        </AdminRoute>
                     }
                 />
                 <Route

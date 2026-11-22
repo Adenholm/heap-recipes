@@ -1,0 +1,109 @@
+.user-management {
+    margin-block: 2rem;
+}
+
+.user-management hr {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid #ccc;
+}
+
+.user-management-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-management-header h1 {
+    margin: 0;
+}
+
+.user-table-wrapper {
+    overflow-x: auto;
+}
+
+.user-management table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.user-management th,
+.user-management td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #d4d2cf;
+}
+
+.user-management form,
+.modal-body form {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.modal-body .form-field {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.modal-body .modal-header {
+    padding-bottom: 0;
+}
+
+.modal-body h2 {
+    margin: 0;
+}
+
+.modal-body form input,
+.modal-body form select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+}
+
+.modal-body form button {
+    justify-self: start;
+    margin-top: 0.25rem;
+}
+
+.user-management button:disabled,
+.modal-body form button:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.user-management-error {
+    color: #a83232;
+}
+
+.user-management-success {
+    color: var(--color-green);
+}
+
+.user-actions {
+    text-align: right;
+}
+
+.user-management .delete-user-button {
+    background-color: var(--color-rederror);
+    padding: 0.25rem 0.5rem;
+}
+
+.delete-user-button img {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}

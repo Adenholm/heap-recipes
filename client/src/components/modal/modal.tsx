@@ -7,14 +7,23 @@ import style from '@/components/modal/style.js';
 import closeIcon from '@/assets/images/close-black.svg';
 
 
-ReactModal.setAppElement('#root');
+const appElement = document.getElementById('root');
+
+if (appElement) {
+  ReactModal.setAppElement(appElement);
+}
 
 const Modal = () => {
   const { isOpen, closeModal, modalComponent, modalHeader } = useContext(ModalContext);
 
 
   return (
-    <ReactModal isOpen={isOpen} onRequestClose={closeModal} style={style}>
+    <ReactModal
+      isOpen={isOpen}
+      onRequestClose={closeModal}
+      style={style}
+      ariaHideApp={!!appElement}
+    >
       <div className="modal-body">
         <section className="modal-header border-bottom">
           <h2>{modalHeader}</h2>

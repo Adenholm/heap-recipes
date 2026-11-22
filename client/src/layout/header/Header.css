@@ -99,6 +99,19 @@
     background-color: #f0f0f0;
 }
 
+.menu li.menu-divider-item {
+    padding: 0;
+    cursor: default;
+}
+
+.menu li.menu-divider-item:hover {
+    background-color: transparent;
+}
+
+.menu li.menu-divider-item .menu-divider {
+    width: 100%;
+}
+
 .menu img {
     height: 1.5rem;
     width: 1.5rem;
