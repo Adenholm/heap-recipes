@@ -21,9 +21,9 @@ public static class DbSeeder
             return;
         }
 
-        if (await db.Users.AnyAsync(u => u.Username == username))
+        if (await db.Users.AnyAsync())
         {
-            logger.LogInformation("Default user '{Username}' already exists, skipping.", username);
+            logger.LogInformation("Users already exist, skipping default user seeding.");
             return;
         }
 

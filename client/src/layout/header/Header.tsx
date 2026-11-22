@@ -5,6 +5,7 @@ import ramen from '@/assets/images/ramen.svg';
 import login from '@/assets/images/login.svg';
 import account from '@/assets/images/account.svg';
 import group from '@/assets/images/group.svg';
+import accountDark from '@/assets/images/account-dark.svg';
 import addRecipe from '@/assets/images/add-recipe.svg';
 import tagIcon from '@/assets/images/tag.svg';
 import logout from '@/assets/images/logout.svg';
@@ -12,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { ModalContext } from '@/context/modal';
 import LoginModal from '@/components/loginModal/Login';
 import { AuthContext } from '@/context/auth';
+import AccountModal from '@/components/accountModal/Account';
 
 const Header = () => {
     const { openModal, setModal } = useContext(ModalContext);
@@ -24,24 +26,46 @@ const Header = () => {
         openModal();
     };
 
+    const showAccountModal = () => {
+        setMenuOpen(false);
+        setModal('Account settings', <AccountModal />);
+        openModal();
+    };
+
     const Menu = ({ onLogout, isAdmin }: { onLogout: () => void; isAdmin: boolean }) => {
-    return (
-        <nav className='menu'>
-            <ul>
-                {isAdmin && <li onClick={() => setMenuOpen(false)}><Link to="/manage-users">
-                <img src={group} alt="Manage Users" className='icon'/>
-                Manage users
-                </Link></li>}
-                {isAdmin && <li className="menu-divider-item"><hr className="menu-divider" /></li>}
-                <li onClick={() => setMenuOpen(false)}><Link to="/edit-tags">
-                <img src={tagIcon} alt="Edit Tags" className='icon'/>
-                Edit tags
-                </Link></li>
-                <li className="menu-divider-item"><hr className="menu-divider" /></li>
-                <li onClick={onLogout}><img src={logout} alt="Log Out" className='icon'/>Log out</li>
-            </ul>
-        </nav>
-    );
+        interface MenuItem {
+            label: string;
+            icon: string;
+            onClick: () => void;
+            to?: string;
+        }
+        const items: MenuItem[] = [
+            { label: 'Account settings', icon: accountDark, onClick: showAccountModal },
+            ...(isAdmin ? [{ label: 'Manage users', icon: group, onClick: () => setMenuOpen(false), to: '/manage-users' }] : []),
+            { label: 'Edit tags', icon: tagIcon, onClick: () => setMenuOpen(false), to: '/edit-tags' },
+            { label: 'Log out', icon: logout, onClick: onLogout },
+        ];
+        return (
+            <nav className="menu" aria-label="User menu">
+                <ul>
+                    {items.map((item, index) => (
+                        <li key={index}>
+                            {item.to ? (
+                                <Link to={item.to} onClick={item.onClick}>
+                                    <img src={item.icon} alt="" className="icon" />
+                                    {item.label}
+                                </Link>
+                            ) : (
+                                <button type="button" onClick={item.onClick}>
+                                    <img src={item.icon} alt="" className="icon" />
+                                    {item.label}
+                                </button>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        );
     };
 
         return (
@@ -61,7 +85,9 @@ const Header = () => {
                     <Link to="/add-recipe">
                         <img src={addRecipe} alt="Add Recipe" className='icon'/>
                     </Link>
-                    <img src={account} alt="" aria-hidden="true" className='icon' onClick={ () => setMenuOpen(!menuOpen) }/>
+                    <button type="button" className="account-menu-button" aria-label="User menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
+                        <img src={account} alt="" className='icon'/>
+                    </button>
                     { menuOpen && <Menu onLogout={onLogout} isAdmin={user?.role === 'Admin'} /> }
                 </div>
                 }

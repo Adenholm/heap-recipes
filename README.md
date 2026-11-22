@@ -141,6 +141,82 @@ This installs the dependencies in `client/`.
 
 Create a `.env` file using [.env.example](.env.example).
 
+Create the file: `appsettings.Development.json`
+
+Replace YOUR_USERNAME and A_STRONG_PASSWORD with your PostgreSQL credentials.
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=heap_recipes;Username=YOUR_USERNAME;Password=A_STRONG_PASSWORD"
+  },
+  "Jwt": {
+    "Key": "dev-secret-key-12345678901234567890",
+    "Issuer": "HeapRecipesApi",
+    "Audience": "HeapRecipesApiUsers",
+    "ExpireMinutes": "60"
+  }
+}
+```
+
+## 4. Default user (optional)
+
+The backend can create a default user on startup when there are no users. It is only created if both a username and a password are configured, so nothing is seeded unless you set them. The user gets the `Admin` role by default. Once a user exists, changing its credentials in the app will not recreate the configured default account.
+
+For local development, store the credentials with [user secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) so they never end up in git. Run this from the `server` folder:
+
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "DefaultUser:Username" "admin"
+dotnet user-secrets set "DefaultUser:Password" "pick-something-strong"
+```
+
+Start the backend and the user is created automatically. Log in with `POST /api/auth/login`.
+
+For Docker or production, use environment variables instead (user secrets are only loaded in the `Development` environment):
+
+```
+DefaultUser__Username=admin
+DefaultUser__Password=your-strong-password
+```
+
+Optionally set `DefaultUser:Role` to use a different role than `Admin`.
+
+Where user secrets are stored on your machine:
+* Windows: `%APPDATA%\Microsoft\UserSecrets\<user_secrets_id>\secrets.json`
+* Linux / macOS: `~/.microsoft/usersecrets/<user_secrets_id>/secrets.json`
+
+The `<user_secrets_id>` is the `UserSecretsId` in `server/HeapReacipesApi.csproj`. Useful commands: `dotnet user-secrets list`, `remove "Key"`, `clear`.
+
+## Testing
+
+The frontend uses [Vitest](https://vitest.dev/) with React Testing Library.
+
+Run the frontend tests from the repository root:
+
+```bash
+cd client
+npm test
+```
+
+Run the tests in watch mode while developing:
+
+```bash
+cd client
+npm run test:watch
+```
+
+Generate an HTML, LCOV, and terminal coverage report:
+
+```bash
+cd client
+npm run test:coverage
+```
+
+Frontend tests run automatically in the `Test Coverage` GitHub Actions workflow. The generated LCOV report is also supplied to the SonarQube analysis workflow.
+
+## 5. Expose the database locally (optional)
+
+To set up a database for development, you may create a `docker-compose.override.yml` file with the following content:
 The default Compose database is intentionally on the internal Docker network. To
 expose it to local .NET development, create `docker-compose.override.yml`:
 
@@ -219,7 +295,7 @@ npm run dev
 | --- | --- |
 | Frontend | <http://localhost:3000> |
 | API | <http://localhost:5036> (HTTPS: <https://localhost:7153>) |
-| Swagger | `/swagger` while the API runs in Development |
+| Swagger | <http://localhost:3000/api/swagger> (or <http://localhost:5036/swagger> directly) |
 
 ---
 
@@ -232,8 +308,15 @@ docker compose up --build
 ```
 
 The frontend is available at <http://localhost:3000>. Nginx serves the frontend
-and proxies `/api/` and `/uploads/` to the backend. PostgreSQL data is stored in
+and proxies `/api/` and `/uploads/` to the backend. Swagger is available at
+<http://localhost:3000/api/swagger> by default, including in Production. Set
+`Swagger__Enabled=false` to disable it outside Development; when enabled, the
+API documentation and UI are publicly accessible. PostgreSQL data is stored in
 the `postgres_data` volume and uploaded images in `recipe_uploads`.
+Compose uses `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` for both
+the database and the API connection. For existing installations, ensure these
+values match the initialized database; changing them does not update an
+existing PostgreSQL volume.
 
 <details>
 <summary>Environment variables expected by the Compose backend</summary>
@@ -243,12 +326,12 @@ the `postgres_data` volume and uploaded images in `recipe_uploads`.
 | Variable | Purpose |
 | --- | --- |
 | `ASPNETCORE_ENVIRONMENT` | API environment, normally `Production` |
-| `ConnectionStrings__DefaultConnection` | PostgreSQL connection string |
 | `JWT__Key` | JWT signing key, at least 32 characters |
 | `Jwt__Issuer` / `Jwt__Audience` | JWT validation values |
 | `Jwt__ExpireMinutes` | Token lifetime in minutes |
 | `AllowedOrigins` | Semicolon-separated allowed origins |
-| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL initialization |
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL initialization and API connection |
+| `Swagger__Enabled` | Enable Swagger outside Development (defaults to `true` in Compose) |
 
 </details>
 
@@ -257,7 +340,8 @@ the `postgres_data` volume and uploaded images in `recipe_uploads`.
 ## API
 
 The API is rooted at `/api`. Interactive documentation is available at
-`/swagger` in Development.
+`/api/swagger` through the frontend proxy, or `/swagger` directly on the API
+when Swagger is enabled.
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
@@ -315,6 +399,7 @@ Docker images, and publishes coverage data from the `main` branch.
 - Database migrations are applied automatically when the API starts.
 - Development startup seeds example recipes only when the database has no recipes.
 
+Signed-in users can change their username or password from **Account settings** in the header's user menu. Their current password is required. Leave the new password fields empty to change only the username. Existing tokens remain valid until they expire, including after a password change.
 
 # Authors
 

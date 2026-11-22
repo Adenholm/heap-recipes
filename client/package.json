@@ -1,7 +1,6 @@
 {
   "name": "heap-recipes",
   "private": true,
-  "homepage": "https://erikpersson0884.github.io/heap-recipes",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

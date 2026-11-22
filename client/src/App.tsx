@@ -1,5 +1,5 @@
 import '@/App.css'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import Mainpage from '@/pages/mainpage/Mainpage'
 import Recipepage from '@/pages/recipepage/Recipepage'
@@ -53,6 +53,10 @@ function App() {
                             <UserManagementPage />
                         </AdminRoute>
                     }
+                />
+                <Route
+                    path='*'
+                    element={<Navigate to='/' />}
                 />
             </Routes>
             <Footer />
