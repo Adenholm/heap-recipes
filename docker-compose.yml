@@ -17,7 +17,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
       - JWT__Key=${JWT__Key}
-      - Jwt__Issuer=${HeapRecipesApi}
+      - Jwt__Issuer=${Jwt__Issuer}
       - Jwt__Audience=${Jwt__Audience}
       - Jwt__ExpireMinutes=${Jwt__ExpireMinutes}
       - AllowedOrigins=${AllowedOrigins}
