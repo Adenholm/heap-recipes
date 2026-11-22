@@ -78,11 +78,11 @@ const StepOne = ({ recipe, handleChange, setImageUrl, tags, setTags, onTitleSele
                                     key={title}
                                     role="option"
                                     aria-selected={index === activeIndex}
+                                    aria-label={title}
                                     onMouseDown={event => event.preventDefault()}
                                     onClick={() => selectTitle(title)}
                                 >
-                                    <span>{title}</span> 
-                                    <span className="exists-indicator">exists</span>
+                                    <span>{title}</span>
                                 </li>
                             ))}
                         </ul>

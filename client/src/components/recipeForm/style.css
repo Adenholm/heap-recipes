@@ -49,7 +49,8 @@
     background: #e6ebda;
 }
 
-.title-suggestions .exists-indicator {
+.title-suggestions-list li::after {
+  content: "exists";
   font-size: 0.8rem;
   color: #888;
   margin-left: auto;
