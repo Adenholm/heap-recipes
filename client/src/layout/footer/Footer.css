@@ -1,14 +1,24 @@
 
-
 .page-footer {
     color: #fff;
 
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
 
     width: 100%;
     margin-top: auto;
+}
+
+.page-footer p {
+    grid-column: 2;
+    margin: 0;
+    text-align: center;
+}
+
+.page-footer {
+    padding-block: 1rem;
 }
 
 .page-footer a {
@@ -17,7 +27,27 @@
 }
 
 .github-link {
-    position: absolute;
-    right: 0px;
-    padding: 1rem 4rem;
+    grid-column: 3;
+    justify-self: end;
+    margin-right: 1.5rem;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    width: 32px;
+}
+
+.github-link img {
+    height: 32px;
+    width: 32px;
+}
+
+@media screen and (max-width: 600px) {
+    .page-footer {
+        gap: 0.75rem;
+    }
+
+    .github-link {
+        justify-self: start;
+        margin-right: 0;
+    }
 }
