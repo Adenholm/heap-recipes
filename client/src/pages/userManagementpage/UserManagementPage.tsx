@@ -1,43 +1,21 @@
-import { FormEvent, useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { isAxiosError } from 'axios';
-import ReactModal from 'react-modal';
 import api from '@/service/apiClient';
 import { AuthContext } from '@/context/auth';
-import modalStyle from '@/components/modal/style.js';
-import '@/components/modal/style.css';
-import '@/components/deleteModal/style.css';
+import { ModalContext } from '@/context/modal';
 import '@/pages/userManagementpage/style.css';
 // @ts-ignore: missing type declaration for SVG import
-import closeIcon from '@/assets/images/close-black.svg';
-// @ts-ignore: missing type declaration for SVG import
 import deleteIcon from '@/assets/images/delete-white.svg';
-
-interface ManagedUser {
-    id: number;
-    username: string;
-    role: string | null;
-}
+import AddUserModal from './AddUserModal';
+import DeleteUserModal, { type ManagedUser } from './DeleteUserModal';
 
 const UserManagementPage = () => {
     const currentUserId = useContext(AuthContext)?.user?.id;
-    const [userToDelete, setUserToDelete] = useState<ManagedUser | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [deleteError, setDeleteError] = useState('');
     const [users, setUsers] = useState<ManagedUser[]>([]);
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('User');
     const [isLoading, setIsLoading] = useState(true);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formError, setFormError] = useState('');
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setFormError('');
-    };
+    const { openModal, setModal, closeModal } = useContext(ModalContext);
 
     const loadUsers = useCallback(async () => {
         setError('');
@@ -61,52 +39,28 @@ const UserManagementPage = () => {
         void loadUsers();
     }, [loadUsers]);
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setFormError('');
+    const showAddUserModal = () => {
         setSuccess('');
-        setIsSubmitting(true);
-
-        try {
-            await api.post('/auth/register', { username, password, role });
-            setUsername('');
-            setPassword('');
-            setRole('User');
+        setModal('Add a user', <AddUserModal onAdded={async () => {
             setSuccess('User added successfully.');
-            setIsModalOpen(false);
             await loadUsers();
-        } catch (requestError) {
-            const message = isAxiosError(requestError) && typeof requestError.response?.data === 'string'
-                ? requestError.response.data
-                : 'Unable to add user. Please try again.';
-            setFormError(message);
-        } finally {
-            setIsSubmitting(false);
-        }
+        }} />);
+        openModal();
     };
 
-    const closeDeleteModal = () => {
-        setUserToDelete(null);
-        setDeleteError('');
-    };
-
-    const handleDelete = async () => {
-        if (!userToDelete) return;
-        setIsDeleting(true);
-        setDeleteError('');
-        try {
-            await api.delete(`/auth/users/${userToDelete.id}`);
-            setSuccess(`User ${userToDelete.username} deleted.`);
-            setUserToDelete(null);
-            await loadUsers();
-        } catch (requestError) {
-            const message = isAxiosError(requestError) && typeof requestError.response?.data === 'string'
-                ? requestError.response.data
-                : 'Unable to delete user. Please try again.';
-            setDeleteError(message);
-        } finally {
-            setIsDeleting(false);
-        }
+    const showDeleteUserModal = (user: ManagedUser) => {
+        setSuccess('');
+        setModal('Delete user', <DeleteUserModal
+            user={user}
+            onCancel={() => {
+                closeModal();
+            }}
+            onDeleted={async () => {
+                setSuccess(`User ${user.username} deleted.`);
+                await loadUsers();
+            }}
+        />);
+        openModal();
     };
 
     return (
@@ -115,7 +69,7 @@ const UserManagementPage = () => {
                 <h1>Manage users</h1>
                 <button 
                     type="button" 
-                    onClick={() => { setSuccess(''); setIsModalOpen(true); }}
+                    onClick={showAddUserModal}
                 >
                     Add user
                 </button>
@@ -148,7 +102,7 @@ const UserManagementPage = () => {
                                                     type="button"
                                                     className="delete-user-button"
                                                     aria-label={`Delete ${user.username}`}
-                                                    onClick={() => { setSuccess(''); setUserToDelete(user); }}
+                                                    onClick={() => showDeleteUserModal(user)}
                                                 >
                                                     <img src={deleteIcon} alt="" />
                                                 </button>
@@ -163,81 +117,6 @@ const UserManagementPage = () => {
             </section>
 
             {success && <p className="user-management-success" role="status">{success}</p>}
-            <ReactModal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                style={modalStyle}
-                appElement={document.getElementById('root') ?? undefined}
-                ariaHideApp={!!document.getElementById('root')}
-            >
-                <div className="modal-body">
-                    <section className="modal-header border-bottom">
-                        <h2>Add a user</h2>
-                        <button type="button" className="modal-close" onClick={closeModal} aria-label="Close modal">
-                            <img src={closeIcon} alt="" />
-                        </button>
-                    </section>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-field">
-                            <label htmlFor="new-username">Username</label>
-                            <input
-                                id="new-username"
-                                type="text"
-                                autoComplete="username"
-                                value={username}
-                                onChange={event => setUsername(event.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="form-field">
-                            <label htmlFor="new-password">Password</label>
-                            <input
-                                id="new-password"
-                                type="password"
-                                autoComplete="new-password"
-                                value={password}
-                                onChange={event => setPassword(event.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="form-field">
-                            <label htmlFor="new-role">Role</label>
-                            <select id="new-role" value={role} onChange={event => setRole(event.target.value)}>
-                                <option value="User">User</option>
-                                <option value="Admin">Admin</option>
-                            </select>
-                        </div>
-                        {formError && <p className="user-management-error" role="alert">{formError}</p>}
-                        <button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Adding user...' : 'Add user'}
-                        </button>
-                    </form>
-                </div>
-            </ReactModal>
-            <ReactModal
-                isOpen={userToDelete !== null}
-                onRequestClose={closeDeleteModal}
-                style={modalStyle}
-                appElement={document.getElementById('root') ?? undefined}
-                ariaHideApp={!!document.getElementById('root')}
-            >
-                <div className="modal-body">
-                    <section className="modal-header border-bottom">
-                        <h2>Delete user</h2>
-                        <button type="button" className="modal-close" onClick={closeDeleteModal} aria-label="Close modal">
-                            <img src={closeIcon} alt="" />
-                        </button>
-                    </section>
-                    <p>Are you sure you want to delete {userToDelete?.username}?</p>
-                    {deleteError && <p className="user-management-error" role="alert">{deleteError}</p>}
-                    <div className="modal-buttons">
-                        <button type="button" onClick={closeDeleteModal}>Cancel</button>
-                        <button type="button" onClick={handleDelete} disabled={isDeleting}>
-                            {isDeleting ? 'Deleting...' : 'Delete'}
-                        </button>
-                    </div>
-                </div>
-            </ReactModal>
         </main>
     );
 };

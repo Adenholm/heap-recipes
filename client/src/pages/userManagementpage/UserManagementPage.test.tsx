@@ -2,6 +2,8 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import UserManagementPage from '@/pages/userManagementpage/UserManagementPage';
+import Modal from '@/components/modal/modal';
+import { ModalProvider } from '@/context/modal';
 import api from '@/service/apiClient';
 
 vi.mock('@/service/apiClient', () => ({
@@ -24,7 +26,12 @@ describe('UserManagementPage', () => {
 
     it('lists users and adds a user', async () => {
         const user = userEvent.setup();
-        render(<UserManagementPage />);
+        render(
+            <ModalProvider>
+                <Modal />
+                <UserManagementPage />
+            </ModalProvider>,
+        );
 
         expect(await screen.findByText('admin')).toBeVisible();
         expect(screen.getByText('Admin')).toBeVisible();
@@ -49,7 +56,12 @@ describe('UserManagementPage', () => {
 
     it('deletes a user after confirmation', async () => {
         const user = userEvent.setup();
-        render(<UserManagementPage />);
+        render(
+            <ModalProvider>
+                <Modal />
+                <UserManagementPage />
+            </ModalProvider>,
+        );
 
         await user.click(await screen.findByRole('button', { name: 'Delete admin' }));
         const dialog = await screen.findByRole('dialog');
@@ -63,7 +75,12 @@ describe('UserManagementPage', () => {
 
     it('shows an error when the user list cannot be loaded', async () => {
         apiMock.get.mockRejectedValueOnce(new Error('network failure'));
-        render(<UserManagementPage />);
+        render(
+            <ModalProvider>
+                <Modal />
+                <UserManagementPage />
+            </ModalProvider>,
+        );
 
         expect(await screen.findByRole('alert')).toHaveTextContent('Unable to load users.');
     });
