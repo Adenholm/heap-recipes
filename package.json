@@ -4,7 +4,7 @@
     "description": "A simple recipe website",
     "main": "index.js",
     "scripts": {
-        "setup": "cd client && npm install",
+        "setup": "npm install && cd client && npm install",
         "client": "cd client && npm run dev",
         "server": "cd server && dotnet run",
         "dev": "concurrently \"npm run server\" \"npm run client\"",
@@ -15,6 +15,6 @@
     ],
     "author": "Erik Persson & Hanna Adenholm",
     "dependencies": {
-        
+        "concurrently": "^10.0.7"
     }
 }

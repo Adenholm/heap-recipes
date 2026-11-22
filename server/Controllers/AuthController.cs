@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using HeapRecipeApi.Data;
 using HeapRecipeApi.Services;
 using System.Security.Claims;
+using System.Text;
 
 namespace HeapRecipeApi.Controllers;
 
@@ -68,7 +69,45 @@ public class AuthController : ControllerBase
 
         return Ok(new { user.Id, user.Username, user.Role });
     }
+
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateAccount(UpdateAccountDto dto)
+    {
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
+
+        var user = await _db.Users.FindAsync(userId);
+        if (user == null)
+            return NotFound();
+
+        if (string.IsNullOrEmpty(dto.CurrentPassword) ||
+            !BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+            return BadRequest("Current password is incorrect.");
+
+        var username = dto.Username?.Trim();
+        if (string.IsNullOrWhiteSpace(username))
+            return BadRequest("Username is required.");
+
+        if (await _db.Users.AnyAsync(u => u.Id != userId && u.Username == username))
+            return BadRequest("Username already taken.");
+
+        if (dto.NewPassword != null &&
+            (string.IsNullOrWhiteSpace(dto.NewPassword) || Encoding.UTF8.GetByteCount(dto.NewPassword) > 72))
+            return BadRequest("New password must not be blank or exceed 72 UTF-8 bytes.");
+
+        if (username == user.Username && dto.NewPassword == null)
+            return BadRequest("There are no changes to save.");
+
+        user.Username = username;
+        if (dto.NewPassword != null)
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+        await _db.SaveChangesAsync();
+        return Ok(new { token = JwtTokenHelper.GenerateToken(user, _config) });
+    }
 }
 
 public record RegisterDto(string Username, string Password);
 public record LoginDto(string Username, string Password);
+public record UpdateAccountDto(string? Username, string? CurrentPassword, string? NewPassword);
