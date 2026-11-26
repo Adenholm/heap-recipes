@@ -30,6 +30,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseNpgsql(connectionString));
 builder.Services.AddSingleton<ImageStorage>();
 builder.Services.AddHostedService<OrphanImageCleaner>();
+builder.Services.AddHttpClient<IRecipeImageReader, GeminiRecipeImageReader>();
 
 // Configure JWT options
 var jwtSection = builder.Configuration.GetSection("Jwt");

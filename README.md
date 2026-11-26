@@ -49,6 +49,7 @@ Heap Recipes is developed by [Hanna Adenholm](https://github.com/adenholm) and
 - 🧩 Organize ingredients and instructions into ordered sections.
 - ✏️ Create, edit, and delete recipes and tags.
 - 🖼️ Upload recipe images, served by the API and persisted in Docker.
+- 🤖 Import a photo of a written recipe into the creation form with Gemini.
 - 🔐 Authenticate with JWT tokens and protect recipe-management actions.
 - 🌱 Seed example recipes automatically in the Development environment.
 - 📱 Installable frontend through the Vite PWA setup.
@@ -125,6 +126,38 @@ Heap Recipes is developed by [Hanna Adenholm](https://github.com/adenholm) and
 - Node.js 22 or newer and npm
 - .NET SDK 9
 - Docker Desktop or Docker Engine with Compose
+
+### Optional: recipe image import
+
+Create a Gemini API key in [Google AI Studio](https://aistudio.google.com/api-keys).
+For Docker, set `Gemini__ApiKey` in the root `.env`, then recreate the backend
+so Compose applies the changed environment:
+
+```bash
+docker compose up -d --force-recreate backend
+```
+
+For local development with `npm run server` or `dotnet run`, .NET does not
+automatically read either `.env` file. Instead, set a user secret in the
+Development environment:
+
+```bash
+dotnet user-secrets set "Gemini:ApiKey" "YOUR_KEY" --project server
+```
+
+Replace `YOUR_KEY` locally, then stop and restart the server. Alternatively,
+set `Gemini__ApiKey` as an environment variable in the server process.
+Keep the key server-side and never commit it.
+
+On Add Recipe, choose a photo of a written recipe and explicitly send it to
+Gemini. Applying the result replaces the form's recipe details, ingredients,
+and instructions; review them before saving. This is separate from the recipe's
+display image. Google offers a [free tier](https://ai.google.dev/gemini-api/docs/pricing)
+with usage limits; availability and pricing can change, and paid accounts may
+incur charges. Images are sent to Google, and free-tier content may be used to
+improve Google's products; do not upload sensitive images.
+If Gemini reports that it is temporarily unavailable, wait and try again;
+the service can return HTTP 503 even when the API key is configured.
 
 ### 1. Install frontend dependencies
 
@@ -331,6 +364,7 @@ existing PostgreSQL volume.
 | `AllowedOrigins` | Semicolon-separated allowed origins |
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL initialization and API connection |
 | `Swagger__Enabled` | Enable Swagger outside Development (defaults to `true` in Compose) |
+| `Gemini__ApiKey` | Optional Gemini API key for recipe image import |
 
 </details>
 

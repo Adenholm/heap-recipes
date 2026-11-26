@@ -4,3 +4,15 @@ GET {{HeapReacipesApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+### Extract a recipe from an image (replace the token and local file path)
+POST {{HeapReacipesApi_HostAddress}}/api/recipe-image
+Authorization: Bearer YOUR_TOKEN
+Content-Type: multipart/form-data; boundary=recipe-image-boundary
+
+--recipe-image-boundary
+Content-Disposition: form-data; name="file"; filename="recipe.jpg"
+Content-Type: image/jpeg
+
+< ./recipe.jpg
+--recipe-image-boundary--

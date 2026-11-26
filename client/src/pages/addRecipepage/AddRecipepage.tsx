@@ -6,6 +6,7 @@ import StepTwo from "@/components/recipeForm/steps/StepTwo";
 import StepThree from "@/components/recipeForm/steps/StepThree";
 import { useNavigate } from "react-router-dom";
 import { useRecipes } from "@/context/recipes";
+import RecipeImageImport, { type ExtractedRecipe } from "@/components/recipeForm/RecipeImageImport";
 
 const AddRecipePage = () => {
     const { addRecipe} = useRecipes();
@@ -34,6 +35,22 @@ const AddRecipePage = () => {
     const [instructionSections, setInstructionSections] = useState<InstructionSection[]>([]);
 
     const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
+    const [importVersion, setImportVersion] = useState(0);
+
+    const applyExtractedRecipe = (extracted: ExtractedRecipe) => {
+        setRecipe((current) => ({
+            ...current,
+            title: extracted.title,
+            description: extracted.description,
+            prepTime: extracted.prepTime ?? 0,
+            servings: extracted.servings ?? 0,
+        }));
+        setIngredients(extracted.ingredients.map((ingredient, sortOrder) => ({ ...ingredient, sortOrder })));
+        setIngredientSections([]);
+        setInstructions(extracted.instructions.map((text, sortOrder) => ({ text, sortOrder })));
+        setInstructionSections([]);
+        setImportVersion((version) => version + 1);
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -110,6 +127,7 @@ const AddRecipePage = () => {
     return (
         <div className="container">
             <h1>Add Recipe</h1>
+                <RecipeImageImport onApply={applyExtractedRecipe} />
                 <Stepper onComplete={handleSubmit}>
                     <StepOne
                         recipe={recipe}
@@ -123,14 +141,14 @@ const AddRecipePage = () => {
                         ingredientSections={ingredientSections}
                         setIngredients={setIngredients}
                         setIngredientSections={setIngredientSections}
-                        resetKey={recipe.id ?? "new"}
+                        resetKey={importVersion}
                     />
                     <StepThree
                         instructions={instructions}
                         instructionSections={instructionSections}
                         setInstructions={setInstructions}
                         setInstructionSections={setInstructionSections}
-                        resetKey={recipe.id ?? "new"}
+                        resetKey={importVersion}
                     />
             </Stepper>
         </div>

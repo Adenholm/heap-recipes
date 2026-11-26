@@ -1,0 +1,18 @@
+.recipe-import {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #bdc9ae;
+    border-radius: 6px;
+}
+
+.recipe-import h2, .recipe-import p {
+    margin: 0;
+}
+
+.recipe-import input {
+    max-width: 100%;
+}
